@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="RegFormPassportInfo">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="536" height="603"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="b5fbf" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="10" left="0" bottom="10" right="10"/>
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d76ab" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font size="20"/>
+              <text value="   Введите паспортные данные"/>
+            </properties>
+          </component>
+          <component id="af4ff" class="javax.swing.JButton" binding="btnInfo">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <focusPainted value="false"/>
+              <icon value="images/icons8-question-32.png"/>
+              <opaque value="false"/>
+              <text value="Нажмите, чтобы узнать больше"/>
+            </properties>
+          </component>
+          <vspacer id="1aa23">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+      <grid id="4deef" layout-manager="GridLayoutManager" row-count="14" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="10" left="10" bottom="10" right="10"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="fac3e" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Серия и номер"/>
+            </properties>
+          </component>
+          <component id="91177" class="javax.swing.JTextField" binding="tfPassportId">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <font size="16"/>
+            </properties>
+          </component>
+          <component id="5f66e" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Кем выдан"/>
+            </properties>
+          </component>
+          <component id="167ab" class="javax.swing.JTextField" binding="tfIssuedBy">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <font size="16"/>
+            </properties>
+          </component>
+          <component id="53959" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Код подразделения"/>
+            </properties>
+          </component>
+          <component id="e6195" class="javax.swing.JTextField" binding="tfDepatrmentNum">
+            <constraints>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <font size="16"/>
+            </properties>
+          </component>
+          <component id="be8a9" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Дата выдачи ДД.ММ.ГГГГ"/>
+            </properties>
+          </component>
+          <component id="d45d0" class="javax.swing.JTextField" binding="tfDateOfIssue">
+            <constraints>
+              <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <font size="16"/>
+            </properties>
+          </component>
+          <vspacer id="67889">
+            <constraints>
+              <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="22cc2">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <grid id="5af45" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <foreground color="-6806827"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="174b" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <foreground color="-855310"/>
+                  <text value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="2a8c6" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <foreground color="-855310"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="15b98" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <foreground color="-855310"/>
+                  <text value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="81813" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <foreground color="-855310"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="8e7a8" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <foreground color="-855310"/>
+                  <text value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="96eb2" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <foreground color="-855310"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="ce544" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <foreground color="-855310"/>
+                  <text value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="39fee" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="10" left="10" bottom="10" right="10"/>
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="e4894" class="javax.swing.JButton" binding="btnOK">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Готово"/>
+            </properties>
+          </component>
+          <component id="74db8" class="javax.swing.JButton" binding="btnCancel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Назад"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
