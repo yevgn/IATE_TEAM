@@ -25,7 +25,6 @@ public class addBookForm extends JDialog {
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -65,7 +64,6 @@ public class addBookForm extends JDialog {
                     showInformationMessage("Успех!", "");
                     dispose();
                 }
-
             }
         });
 
@@ -120,6 +118,7 @@ public class addBookForm extends JDialog {
     private void showInformationMessage(String message, String title){
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
+
     private void showErrorMessage(String message, String title){
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
     }
