@@ -20,7 +20,7 @@ public class LoginForm extends JDialog{
         setContentPane(panel1);
         setLocation(500, 250);
         setModal(true);
-        setSize(new Dimension(900, 600));
+        setSize(new Dimension(800, 600));
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
