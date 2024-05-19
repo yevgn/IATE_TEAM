@@ -15,7 +15,7 @@ public class AdminLoginForm extends JDialog {
         setContentPane(panel1);
         setLocation(500, 250);
         setModal(true);
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(400, 250));
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
