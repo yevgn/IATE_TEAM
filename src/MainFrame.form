@@ -17,7 +17,7 @@
         </properties>
         <border type="none"/>
         <children>
-          <grid id="c162d" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="c162d" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
               <splitpane position="left"/>
@@ -31,7 +31,7 @@
             <children>
               <vspacer id="ffbce">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                 </constraints>
               </vspacer>
               <grid id="7878c" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -40,7 +40,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <background color="-11597159"/>
+                  <background color="-10155343"/>
                 </properties>
                 <border type="none"/>
                 <children>
@@ -78,72 +78,16 @@
                   </component>
                 </children>
               </grid>
-              <grid id="b371e" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="b371e" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <background color="-11597159"/>
+                  <background color="-10155343"/>
                 </properties>
                 <border type="none"/>
                 <children>
-                  <component id="e28ea" class="javax.swing.JButton" binding="btnLibrary">
-                    <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <background color="-13152526"/>
-                      <borderPainted value="false"/>
-                      <contentAreaFilled value="false"/>
-                      <focusPainted value="false"/>
-                      <font size="18"/>
-                      <foreground color="-855310"/>
-                      <text value="Библиотека"/>
-                    </properties>
-                  </component>
-                  <component id="c657a" class="javax.swing.JButton" binding="btnPlannedSessions">
-                    <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <background color="-13152526"/>
-                      <borderPainted value="false"/>
-                      <contentAreaFilled value="false"/>
-                      <focusPainted value="false"/>
-                      <font size="18"/>
-                      <foreground color="-855310"/>
-                      <text value="Запланированные сеансы"/>
-                    </properties>
-                  </component>
-                  <component id="b7740" class="javax.swing.JButton" binding="btnProfile">
-                    <constraints>
-                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <background color="-13152526"/>
-                      <borderPainted value="false"/>
-                      <contentAreaFilled value="false"/>
-                      <focusPainted value="false"/>
-                      <font size="18"/>
-                      <foreground color="-855310"/>
-                      <text value="Профиль"/>
-                    </properties>
-                  </component>
-                  <component id="4c38" class="javax.swing.JButton" binding="btnHelp">
-                    <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <background color="-13152526"/>
-                      <borderPainted value="false"/>
-                      <contentAreaFilled value="false"/>
-                      <focusPainted value="false"/>
-                      <font size="18"/>
-                      <foreground color="-986384"/>
-                      <text value="Помощь"/>
-                    </properties>
-                  </component>
                   <component id="55f51" class="javax.swing.JButton" binding="btnMain">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -157,6 +101,110 @@
                       <foreground color="-855310"/>
                       <opaque value="false"/>
                       <text value="Главная"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="25503" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="c657a" class="javax.swing.JButton" binding="btnPlannedSessions">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <text value="Запланированные сеансы"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="55c79" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="b7740" class="javax.swing.JButton" binding="btnProfile">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <text value="Профиль"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="fd273" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="e28ea" class="javax.swing.JButton" binding="btnLibrary">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <text value="Библиотека"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="810c9" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="4c38" class="javax.swing.JButton" binding="btnHelp">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-986384"/>
+                      <text value="Помощь"/>
                     </properties>
                   </component>
                 </children>
@@ -312,13 +360,13 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="eba79" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="eba79" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <background color="-6511960"/>
+                      <background color="-986384"/>
                       <foreground color="-394497"/>
                     </properties>
                     <border type="none"/>
