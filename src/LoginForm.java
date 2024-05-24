@@ -12,7 +12,6 @@ public class LoginForm extends JDialog{
     private JPasswordField pfPassword;
     private JButton btnLogIn;
     private JButton btnSignUp;
-    private JButton btnForgotPassword;
     private User user;
 
     public LoginForm(JFrame parent) {
@@ -24,7 +23,7 @@ public class LoginForm extends JDialog{
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JButton[] buttons = {btnSignUp, btnForgotPassword};
+        JButton[] buttons = {btnSignUp};
         for(JButton button : buttons){
             Font font = button.getFont();
 
@@ -54,34 +53,32 @@ public class LoginForm extends JDialog{
                     ResultSet res = statement.executeQuery(query);
 
                     if(!res.next()){ // неправильные данные или не зарегистрирован
-                        showErrorMessage("Ошибка", "Неправильные данные");
+                        showMessage("Ошибка", "Неправильные данные", JOptionPane.ERROR_MESSAGE);
                     } else{ // такой человек зарегистрирован
                         // должны проверить, если ли пользователь в черном списке
-                        if(res.getInt("isblocked") == 1){ // в черном списке
-                            showInformationMessage("Внимание!", "Вы в черном списке библиотеки!");
+                        if(res.getBoolean("is_blocked")){ // в черном списке
+                            showMessage("Внимание!", "Вы в черном списке библиотеки!",
+                                    JOptionPane.INFORMATION_MESSAGE);
 
                         } else { // не в черном списке
-                            res = statement.executeQuery(query);
-                           if(res.next()) {
-                                int id = res.getInt("userid");
+                                int id = res.getInt("id");
                                 String name = res.getString("name");
                                 String surname = res.getString("surname");
                                 String patronymic = res.getString("patronymic");
                                 String phone = res.getString("phone");
                                 int age = res.getInt("age");
-                                user = new User(id, name, surname, patronymic, phone, email, password, age, "", "", "", "");
+                                user = new User(id, name, surname, patronymic, phone, email, password, age);
                                 dispose();
                                 createMainFrame();
-                            }
                             // Здесь идет запуск нового окна, старое закрывается
                         }
                     }
 
                 } catch (SQLException ex){
                     ex.printStackTrace();
-                    showErrorMessage("Ошибка", "Ошибка соединения с базой данных. Попробуйте позже.");
+                    showMessage("Ошибка", "Ошибка соединения с базой данных. Попробуйте позже.",
+                            JOptionPane.ERROR_MESSAGE);
                 }
-
             }
         });
 
@@ -89,48 +86,29 @@ public class LoginForm extends JDialog{
         btnSignUp.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                setFrameInvisible();
                 createRegistrationForm();
-            }
-        });
-
-        btnForgotPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setInvisible();
-                createPasswordRecoveryForm();
             }
         });
 
         setVisible(true);
     }
 
-    private void showErrorMessage(String title, String message){
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-    }
 
-    private void showInformationMessage(String title, String message){
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+    private void showMessage(String title, String message, int type){
+        JOptionPane.showMessageDialog(this, message, title, type);
     }
 
     private MainFrame createMainFrame(){
         return new MainFrame(null, user);
     }
 
-   //public String getEmail(){
-    //    return tfEmail.getText();
-   // }
-
-    private void setInvisible(){
+    private void setFrameInvisible(){
         setVisible(false);
     }
 
-    private PasswordRecoveryForm createPasswordRecoveryForm(){
-        return new PasswordRecoveryForm(null, this);
-    }
-
     private RegForm createRegistrationForm(){
-        return new RegForm(null);
+        return new RegForm(null, this);
     }
 
 }

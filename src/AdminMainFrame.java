@@ -728,21 +728,21 @@ public class AdminMainFrame extends JDialog {
                 ArrayList<Session> sessions = new ArrayList<>();
 
                 while (res.next()) {
-                    User user = new User(res.getInt("userid"), res.getString("name"), res.getString("surname"),
-                            res.getString("patronymic"), "", "", "", 0, res.getString("passportid"),
-                            res.getString("issuedby"), res.getString("departmentnumber"), res.getString("dateofissue"));
-                    sessions.add(new Session(res.getString("book"), res.getString("author"), res.getString("date"),
-                            res.getString("starttime") + " - " + res.getString("endtime"), user));
+//                    User user = new User(res.getInt("userid"), res.getString("name"), res.getString("surname"),
+//                            res.getString("patronymic"), "", "", "", 0, res.getString("passportid"),
+//                            res.getString("issuedby"), res.getString("departmentnumber"), res.getString("dateofissue"));
+//                    sessions.add(new Session(res.getString("book"), res.getString("author"), res.getString("date"),
+//                            res.getString("starttime") + " - " + res.getString("endtime"), user));
                 }
                 //сортируем массив по starttime
                 sortSessions(sessions);
                 for (int i = 0; i < sessions.size(); i++) {
                     Session session = sessions.get(i);
                     User user = session.getUser();
-
-                    Object[] rowData = {session.getBook(), session.getAuthor(), session.getTime(), user.getSurname() + " " + user.getName() + " " +
-                            user.getPatronymic(), user.getId(), user.getPassportId(), user.getIssuedBy(), user.getDepartmentNum(), user.getDateOfIssue()};
-                    model.addRow(rowData);
+//
+//                    Object[] rowData = {session.getBook(), session.getAuthor(), session.getTime(), user.getSurname() + " " + user.getName() + " " +
+//                            user.getPatronymic(), user.getId(), user.getPassportId(), user.getIssuedBy(), user.getDepartmentNum(), user.getDateOfIssue()};
+//                    model.addRow(rowData);
                 }
 
             } catch (SQLException exception) {

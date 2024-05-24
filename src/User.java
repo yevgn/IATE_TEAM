@@ -7,15 +7,11 @@ public class User {
     private String email;
     private String password;
     private int age;
-    private String passportId;
-    private String issuedBy;
-    private String departmentNum;
-    private String dateOfIssue;
 
     public User() {}
 
-    public User(int id, String name, String surname, String patronymic, String phone, String email, String password, int age,
-                String passportId, String issuedBy, String departmentNum, String dateOfIssue) {
+    public User(int id, String name, String surname, String patronymic, String phone, String email,
+                String password, int age) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -24,10 +20,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.age = age;
-        this.passportId = passportId;
-        this.issuedBy = issuedBy;
-        this.departmentNum =departmentNum;
-        this.dateOfIssue = dateOfIssue;
+
     }
 
     public void setPassword(String password){
@@ -62,21 +55,6 @@ public class User {
         this.age = age;
     }
 
-    public void setPassportId(String passportId) {
-        this.passportId = passportId;
-    }
-
-    public void setIssuedBy(String issuedBy) {
-        this.issuedBy = issuedBy;
-    }
-
-    public void setDepartmentNum(String departmentNum) {
-        this.departmentNum = departmentNum;
-    }
-
-    public void setDateOfIssue(String dateOfIssue) {
-        this.dateOfIssue = dateOfIssue;
-    }
 
     public int getId() {
         return id;
@@ -110,19 +88,4 @@ public class User {
         return password;
     }
 
-    public String getPassportId() {
-        return passportId;
-    }
-
-    public String getIssuedBy() {
-        return issuedBy;
-    }
-
-    public String getDepartmentNum() {
-        return departmentNum;
-    }
-
-    public String getDateOfIssue() {
-        return dateOfIssue;
-    }
 }
