@@ -23,6 +23,7 @@ public class addBookForm extends JDialog {
     private JPanel panel1;
     private JButton btnChooseImage;
     private JTextField tfAuthorSurname;
+
     private String imagepath = "";
 
     public addBookForm(JFrame parent, DefaultTableModel model, ArrayList<Book> books){

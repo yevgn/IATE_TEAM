@@ -35,6 +35,7 @@ public class AdminMainFrame extends JDialog {
     CardLayout cardLayout;
     String today;
     boolean allTimeSessionsWasClicked = false;
+
     JTable usersTable;
     JTable tableBlackList;
     private final String PHONE_NUM_BEGIN = "+7";
@@ -563,7 +564,6 @@ public class AdminMainFrame extends JDialog {
         pnlUsers.updateUI();
 
     }
-
 
     private void createTableBlackList(){
         pnlBlackList.removeAll();
