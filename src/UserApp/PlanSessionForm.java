@@ -11,18 +11,21 @@ import java.time.LocalDate;
 import java.util.*;
 
 import database.Database;
+import mainClasses.Book;
 
 public class PlanSessionForm extends JDialog {
     private JPanel panel1;
     private JComboBox cbDay;
     private JComboBox cbTime;
     private JButton btnOK;
+
+    private String bookName;
+
     final int daysToPlanSessionAhead = 30;
-    private final String bookName;
     private boolean dayIsChosen = false;
     private final String SESSION_NOT_COMPLETED = "не завершена";
 
-    public PlanSessionForm(JFrame parent, BookInfo bookInfo, int userId){
+    public PlanSessionForm(JFrame parent, BookInfo bookInfo, int userId, Book book){
         super(parent);
        setContentPane(panel1);
         setLocation(500, 250);
@@ -38,10 +41,8 @@ public class PlanSessionForm extends JDialog {
             }
         });
 
-        bookName = bookInfo.getBook().getName();
-
+        bookName = book.getName();
         fillCbDay();
-
 
         cbDay.addActionListener(new ActionListener() {
             @Override
@@ -59,34 +60,31 @@ public class PlanSessionForm extends JDialog {
             }
         });
 
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(!dayIsChosen )
-                    showErrorMessage("Выберите день и время сеанса!", "Ошибка!");
-                else{
-                    String fullDate = (String) cbDay.getSelectedItem();
-                    String date = fullDate.substring(fullDate.length() - 5);
-                    String time = (String) cbTime.getSelectedItem();
-                    String startTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
-                            + " " +  time.substring(0, 5);
-                    String endTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
-                    + " " + time.substring(8, 13);
+        btnOK.addActionListener(e -> {
+            if(!dayIsChosen )
+                showErrorMessage("Выберите день и время сеанса!", "Ошибка!");
+            else{
+                String fullDate = (String) cbDay.getSelectedItem();
+                String date = fullDate.substring(fullDate.length() - 5);
+                String time = (String) cbTime.getSelectedItem();
+                String startTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
+                        + " " +  time.substring(0, 5);
+                String endTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
+                + " " + time.substring(8, 13);
 
-                    try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-                        Statement statement = connection.createStatement()){
+                try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+                    Statement statement = connection.createStatement()){
 
-                       final String query = "insert into sessions (user_id, book_id, start_time, end_time, status) " +
-                               "values('" + userId + "', (select id from books where name = '" + bookInfo.getBook().getName() +
-                               "'), '" + startTime + "', '" + endTime + "', '" + SESSION_NOT_COMPLETED + "');";
-                       statement.executeUpdate(query);
-                       showInformationMessage("Сеанс назначен", "Сообщение");
-                       dispose();
-                       bookInfo.dispose();
-                    } catch (SQLException ex){
-                        showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-                        ex.printStackTrace();
-                    }
+                   final String query = "insert into sessions (user_id, book_id, start_time, end_time, status) " +
+                           "values('" + userId + "', (select id from books where name = '" + bookName +
+                           "'), '" + startTime + "', '" + endTime + "', '" + SESSION_NOT_COMPLETED + "');";
+                   statement.executeUpdate(query);
+                   showInformationMessage("Сеанс назначен", "Сообщение");
+                   dispose();
+                   bookInfo.dispose();
+                } catch (SQLException ex){
+                    showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
+                    ex.printStackTrace();
                 }
             }
         });

@@ -24,14 +24,14 @@ public class BookInfo extends JDialog {
     private JPanel pnlDescr;
     private JPanel pnlCenter;
     private JPanel southPanel;
-    private JLabel lbDescr;
+
     private final String GENRES_LABEL = "Жанры: ";
     private final String NAME_LABEL  = "Название: ";
     private final String AUTHOR_LABEL = "Автор: ";
     private final String RATING_LABEL = "Оценка (Литрес): ";
     private String YEAR_LABEL = "Год издания: ";
     private final int numOfLettersInOneString = 120;
-    private Book book;
+
 
     public BookInfo(JFrame parent, Book book, int userId){
         super(parent);
@@ -47,7 +47,7 @@ public class BookInfo extends JDialog {
         pnlCenter.setBorder(new EmptyBorder(0, 20, 0, 20));
         taDescription.setEditable(false);
 
-        this.book = book;
+
         lbName.setText(NAME_LABEL + book.getName());
         lbAuthor.setText(AUTHOR_LABEL + book.getAuthorName() + " " + book.getAuthorSurname());
         lbYear.setText(YEAR_LABEL + String.valueOf(book.getYearOfPublishing()));
@@ -84,7 +84,7 @@ public class BookInfo extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
-                createPlanSessionForm(userId);
+                createPlanSessionForm(userId, book);
             }
         });
 
@@ -130,11 +130,8 @@ public class BookInfo extends JDialog {
     }
 
 
-    private PlanSessionForm createPlanSessionForm(int userId){
-        return new PlanSessionForm(null, this, userId);
+    private PlanSessionForm createPlanSessionForm(int userId, Book book){
+        return new PlanSessionForm(null, this, userId, book);
     }
 
-    public Book getBook(){
-        return book;
-    }
 }

@@ -17,7 +17,6 @@ public class LoginForm extends JDialog{
     private JPasswordField pfPassword;
     private JButton btnLogIn;
     private JButton btnSignUp;
-    private User user;
 
     public LoginForm(JFrame parent) {
         super(parent);
@@ -47,44 +46,42 @@ public class LoginForm extends JDialog{
             });
         }
 
-        btnLogIn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-                    Statement statement = connection.createStatement()){
-                    String email = tfEmail.getText();
-                    String password = String.valueOf(pfPassword.getPassword());
-                    String query = "select * from users where email = '" + email + "' and password = '" + password + "';";
-                    ResultSet res = statement.executeQuery(query);
+        btnLogIn.addActionListener(e -> {
+            try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+                Statement statement = connection.createStatement()){
+                String email = tfEmail.getText();
+                String password = String.valueOf(pfPassword.getPassword());
 
-                    if(!res.next()){ // неправильные данные или не зарегистрирован
-                        showMessage("Ошибка", "Неправильные данные", JOptionPane.ERROR_MESSAGE);
-                    } else{ // такой человек зарегистрирован
-                        // должны проверить, если ли пользователь в черном списке
-                        if(res.getBoolean("is_blocked")){ // в черном списке
-                            showMessage("Внимание!", "Вы в черном списке библиотеки!",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                final String QUERY = "select * from users where email = '" + email + "' and password = '"
+                        + password + "';";
+                ResultSet res = statement.executeQuery(QUERY);
 
-                        } else { // не в черном списке
-                                int id = res.getInt("id");
-                                String name = res.getString("name");
-                                String surname = res.getString("surname");
-                                String patronymic = res.getString("patronymic");
-                                patronymic = patronymic.equals("null") ? null : patronymic;
-                                String phone = res.getString("phone");
-                                int age = res.getInt("age");
-                                user = new User(id, name, surname, patronymic, phone, email, password, age);
-                                dispose();
-                                createMainFrame();
-                            // Здесь идет запуск нового окна, старое закрывается
-                        }
+                if(!res.next()){ // неправильные данные или не зарегистрирован
+                    showMessage("Ошибка", "Неправильные данные", JOptionPane.ERROR_MESSAGE);
+                } else{ // такой человек зарегистрирован
+                    // должны проверить, если ли пользователь в черном списке
+                    if(res.getBoolean("is_blocked")){ // в черном списке
+                        showMessage("Внимание!", "Вы в черном списке библиотеки!",
+                                JOptionPane.INFORMATION_MESSAGE);
+
+                    } else { // не в черном списке
+                            int id = res.getInt("id");
+                            String name = res.getString("name");
+                            String surname = res.getString("surname");
+                            String patronymic = res.getString("patronymic");
+                            String phone = res.getString("phone");
+                            int age = res.getInt("age");
+                            User user = new User(id, name, surname, patronymic, phone, email, password, age);
+                            dispose();
+                            createMainFrame(user);
+                        // Здесь идет запуск нового окна, старое закрывается
                     }
-
-                } catch (SQLException ex){
-                    ex.printStackTrace();
-                    showMessage("Ошибка", "Ошибка соединения с базой данных. Попробуйте позже.",
-                            JOptionPane.ERROR_MESSAGE);
                 }
+
+            } catch (SQLException ex){
+                ex.printStackTrace();
+                showMessage("Ошибка", "Ошибка соединения с базой данных. Попробуйте позже.",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -105,7 +102,7 @@ public class LoginForm extends JDialog{
         JOptionPane.showMessageDialog(this, message, title, type);
     }
 
-    private MainFrame createMainFrame(){
+    private MainFrame createMainFrame(User user){
         return new MainFrame(null, user);
     }
 

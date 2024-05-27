@@ -1,15 +1,9 @@
 package UserApp;
 
-import mainClasses.Phone;
 import mainClasses.User;
-
 import database.Database;
 
-import exceptions.*;
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.*;
@@ -26,8 +20,6 @@ public class RegForm extends JDialog{
     private JTextField tfName;
     private JTextField tfSurname;
     private JTextField tfPatronymic;
-    private User user;
-    LoginForm loginForm;
 
     public RegForm(JFrame parent, LoginForm loginForm)  {
         super(parent);
@@ -36,6 +28,7 @@ public class RegForm extends JDialog{
         setModal(true);
         setSize(440, 480);
         setResizable(false);
+
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -44,53 +37,36 @@ public class RegForm extends JDialog{
                 loginForm.setVisible(true);
             }
         });
-        this.loginForm = loginForm;
 
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = tfName.getText();
-                String surname = tfSurname.getText();
-                String patronymic = tfPatronymic.getText();
-                String age = tfAge.getText();
-                String email = tfEmail.getText();
-                String phone = tfPhone.getText();
-                String password = String.valueOf(pfPassword.getPassword());
-                String password1 = String.valueOf(pfPassword1.getPassword());
+        btnOK.addActionListener(e -> {
+            String name = tfName.getText();
+            String surname = tfSurname.getText();
+            String patronymic = tfPatronymic.getText();
+            String age = tfAge.getText();
+            String email = tfEmail.getText();
+            String phone = tfPhone.getText();
+            String password = String.valueOf(pfPassword.getPassword());
+            String password1 = String.valueOf(pfPassword1.getPassword());
 
-                try {
-                    if (name.isEmpty() || surname.isEmpty() || age.isEmpty() || email.isEmpty() || password.isEmpty() || password1.isEmpty() ||
-                            phone.isEmpty()) {
-                        showMessage("Ошибка!", "Некоторые поля остались незаполненными!", JOptionPane.ERROR_MESSAGE);
-                    } else if (Integer.parseInt(age) <= 0) {
-                        throw new IncorrectAgeException();
-                    } else if (!password.equals(password1)) {
-                        showMessage("Ошибка!", "Пароли не совпадают!", JOptionPane.ERROR_MESSAGE);
-                    } else if(!Phone.isCorrectNumber(phone)){ // проверка номера телефона
-                        throw new IncorrectPhoneNumberException();
-                    }  else{
-                        if(isUserExistInDatabase(email, phone)){ // если в базе уже есть такой человек
-                            showMessage("Ошибка!", "Пользователь с таким номером телефона или адресом " +
-                                    "электронной почты уже зарегистрирован", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            user = new User();
-                            user.setName(name);
-                            user.setSurname(surname);
-                            user.setPatronymic(patronymic.isEmpty() ? null : patronymic);
-                            user.setAge(Integer.parseInt(age));
-                            user.setEmail(email);
-                            user.setPhone(phone);
-                            user.setPassword(password);
-                            addUserToDatabase(user);
-                            showMessage("", "Вы были успешно зарегистированы!", JOptionPane.INFORMATION_MESSAGE);
-                            dispose();
-                            setLoginFormVisible();
-                        }
-                    }
-                } catch (IncorrectAgeException | NumberFormatException ex ){
-                    showMessage("Ошибка!", "Неправильно указан возраст!", JOptionPane.ERROR_MESSAGE);
-                } catch (IncorrectPhoneNumberException ex){
-                    showMessage("Ошибка!", "Неправильно указан номер телефона!", JOptionPane.ERROR_MESSAGE);
+            if (dataIsCorrect(name, surname, age, email, phone, password, password1)) {
+                if (!isUserExistInDatabase(email, phone)) {
+                    User user = new User();
+                    user.setName(name);
+                    user.setSurname(surname);
+                    user.setPatronymic(patronymic.isEmpty() ? "" : patronymic);
+                    user.setAge(Integer.parseInt(age));
+                    user.setEmail(email);
+                    user.setPhone(phone);
+                    user.setPassword(password);
+
+                    addUserToDatabase(user);
+
+                    showMessage("", "Вы были успешно зарегистированы!", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                    loginForm.setVisible(true);
+                } else {
+                    showMessage("Ошибка!", "Пользователь с таким номером телефона или адресом " +
+                            "электронной почты уже зарегистрирован", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -98,10 +74,50 @@ public class RegForm extends JDialog{
         setVisible(true);
     }
 
+
     private void showMessage(String title, String message, int type){
         JOptionPane.showMessageDialog(this, message, title, type);
     }
 
+    private boolean dataIsCorrect(String name, String surname, String age, String email, String phone,
+                               String password, String password1){
+
+        try {
+            if (name.isEmpty() || surname.isEmpty() || age.isEmpty() || email.isEmpty() || password.isEmpty()
+                    || password1.isEmpty() || phone.isEmpty()) {
+                showMessage("Ошибка!", "Некоторые поля остались незаполненными!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            } else if (Integer.parseInt(age) <= 0) {
+                showMessage("Ошибка!", "Неправильно указан возраст!", JOptionPane.ERROR_MESSAGE);
+            } else if (!password.equals(password1)) {
+                showMessage("Ошибка!", "Пароли не совпадают!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            } else if (!isCorrectPhoneNumber(phone)) { // проверка номера телефона
+                showMessage("Ошибка!", "Неправильно указан номер телефона!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            } else return true;
+        } catch (NumberFormatException ex){
+            ex.printStackTrace();
+            showMessage("Ошибка!", "Неправильно указан возраст!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return false;
+    }
+
+    private boolean isCorrectPhoneNumber(String phone) {
+        int length = phone.length();
+        if (length != 10)
+            return false;
+
+        char ch;
+        for (int i = 0; i < length; i++) {
+            ch = phone.charAt(i);
+            if (ch < 48 || ch > 57)
+                return false;
+        }
+        return true;
+    }
 
     private void addUserToDatabase(User user){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
@@ -120,30 +136,25 @@ public class RegForm extends JDialog{
                 user.setId(res.getInt("id"));
 
         } catch (SQLException ex){
-            showMessage("Ошибка!", "Ошибка соединения с базой данных. Попробуйте позже.", JOptionPane.ERROR_MESSAGE);
+            showMessage("Ошибка!", "Ошибка соединения с базой данных. Попробуйте позже.",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
 
-    private void setLoginFormVisible(){
-        loginForm.setVisible(true);
-    }
-
-
-    public User getUser(){
-        return user;
-    }
 
     private boolean isUserExistInDatabase(String email, String phone){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
             Statement statement = connection.createStatement()){
 
-            final String query = "select id from users where email = '" + email + "' or phone = '" + "+7".concat(phone) + "';";
+            final String query = "select id from users where email = '" + email +
+                    "' or phone = '" + "+7".concat(phone) + "';";
             ResultSet res = statement.executeQuery(query);
             if(res.next())
                 return true;
         } catch (SQLException ex){
-            showMessage("Ошибка!", "Ошибка соединения с базой данных. Попробуйте позже.", JOptionPane.ERROR_MESSAGE);
+            showMessage("Ошибка!", "Ошибка соединения с базой данных. Попробуйте позже.",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
         return false;

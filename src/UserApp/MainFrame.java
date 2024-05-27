@@ -1,7 +1,6 @@
 package UserApp;
 
 import mainClasses.Book;
-import mainClasses.Phone;
 import mainClasses.Session;
 import mainClasses.User;
 import  mainClasses.BookInfoWithoutGenres;
@@ -47,42 +46,37 @@ public class MainFrame extends JDialog{
     private JTextArea taHelp;
     private JButton btnMain;
     private JPanel pnlCardMain;
-    private JLabel labelLeftBookGenre;
-    private JLabel labelUsersForMonth;
     private JLabel labelBooksAvailable;
-    private JLabel labelLeftImage;
-    private JScrollPane spLeft;
     private JTextField tfID;
     private JButton btnLogOut;
     private JButton btnDeleteAccount;
-    private JButton btnLeftBook;
-    private JButton btnRightBook;
     private JLabel tfGreeting;
     private JLabel tfText;
     private JPanel MainCardCenterPanel;
     private JPanel pnlEditData;
     private JPanel pnlChangePassw;
     private JPanel pnlRecommendedBooks;
-    //private JPanel pnlLibrary;
     private CardLayout cardLayout;
-    private User user;
     private JButton btnDeleteSessions;
-    private String[] favGenres = new String[2];
-    private JButton[] bookButtons;
-    private Book[] allBooksFromDB;
+
     private final int RECOMMENDED_BOOKS_LIMIT = 8;
     private final String helpText = "Если у вас возникли проблемы или вы хотите получить дополнительную информацию, " +
             "свяжитесь\nс командой разработчкиков.";
     private final String WELCOME = "Добро пожаловать";
     private final String LABEL_BOOK_TEXT = "Доступно книг: ";
+    private final String NO_GENRE_MATTER = "Все жанры";
     private ArrayList<Book> recommendedBooks = new ArrayList<>();
-    String QUERY_GET_ALL_BOOKS_FROM_DB  = "select b.name AS book, b.year_publish AS year, b.rating AS b_rating," +
+    private final String QUERY_GET_ALL_BOOKS_FROM_DB  = "select b.name AS book, b.year_publish AS year, b.rating AS b_rating," +
             " b.description AS descr, b.imagepath AS b_imagepath, " +
             "a.name AS author_name, a.surname AS author_surname, g.name AS genre " +
             "from book_genre bg join books b on bg.book_id = b.id join " +
             "genres g on g.id = bg.genre_id join authors a on a.id = b.author_id order by b.name;";
-   private ArrayList<Session> ss;
-   private final String NO_GENRE_MATTER = "Все жанры";
+
+    private final User user;
+    private String[] favGenres = new String[2];
+    private JButton[] bookButtons;
+    private Book[] allBooksFromDB;
+    private ArrayList<Session> ss;
 
     public MainFrame(JFrame parent, User user){
         super(parent);
@@ -92,12 +86,10 @@ public class MainFrame extends JDialog{
         setSize(new Dimension(1200, 900));
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        cardLayout = (CardLayout) pnlCards.getLayout();
-        this.user = user;
-        cbGenres.setVisible(false);
-        tfSearch.setVisible(false);
 
-        fillCbGenre();
+        this.user = user;
+
+        cardLayout = (CardLayout) pnlCards.getLayout();
 
         JButton[] buttons = {btnMain, btnLibrary, btnPlannedSessions, btnProfile, btnHelp};
         for(JButton btn : buttons){
@@ -130,8 +122,7 @@ public class MainFrame extends JDialog{
                 tfSearch.setVisible(true);
                 tfSearch.setText("Поиск");
 
-
-                restoreButtons();
+                restoreBookList();
                 cardLayout.show(pnlCards, "pnlCardLibrary");
             }
         });
@@ -142,7 +133,7 @@ public class MainFrame extends JDialog{
 
                 pnlCardPlannedSessions.removeAll();
                 ss = getFollowingSessionsFromDatabase();
-                createSessionsTable();
+                createSessionsPanel();
                 btnDeleteSessions.setEnabled(false);
                 pnlCardPlannedSessions.updateUI();
 
@@ -165,10 +156,12 @@ public class MainFrame extends JDialog{
             }
         });
 
+        fillCbGenre();
+
         allBooksFromDB = getBookListFromDB(QUERY_GET_ALL_BOOKS_FROM_DB).toArray(new Book[0]); // книги с БД
         QuickSort.quickSort(allBooksFromDB, 0, allBooksFromDB.length - 1);
         labelBooksAvailable.setText(LABEL_BOOK_TEXT + allBooksFromDB.length);
-        displayButtonsOnPanel(allBooksFromDB);
+        createBookListPanel();
 
         tfSearch.addKeyListener(new KeyAdapter() {
             @Override
@@ -180,9 +173,9 @@ public class MainFrame extends JDialog{
                     boolean textMatters = !text.isEmpty();
 
                     if (!genreMatters && !textMatters)
-                        restoreButtons();
+                        restoreBookList();
                     else {
-                        restoreButtons();
+                        restoreBookList();
                         ArrayList<Book> booksFound = new ArrayList<>();
                         for (Book book : allBooksFromDB) {
                             if (textMatters) {
@@ -217,7 +210,7 @@ public class MainFrame extends JDialog{
         });
 
         tfFullName.setText(user.getSurname() + " " + user.getName() + " " +
-                (user.getPatronymic() == null ? "" : user.getPatronymic()));
+                (user.getPatronymic()));
         tfPhone.setText(user.getPhone());
         tfEmail.setText(user.getEmail());
         tfFullName.setBorder(null);
@@ -299,7 +292,7 @@ public class MainFrame extends JDialog{
                     String updPhone = tfPhone.getText();
                     String updEmail = tfEmail.getText();
 
-                   if(!Phone.isCorrectNumber(updPhone) || updEmail.isEmpty()) {
+                   if(!isCorrectPhoneNumber(updPhone) || updEmail.isEmpty()) {
                         showErrorMessage("Неправильно указаны данные", "Ошибка!");
                         restoreOldValues();
                     }
@@ -370,7 +363,6 @@ public class MainFrame extends JDialog{
         }
 
         taHelp.setText(helpText);
-
         tfGreeting.setText(WELCOME + ", " + user.getName() + "!");
         MainCardCenterPanel.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
 
@@ -410,6 +402,20 @@ public class MainFrame extends JDialog{
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
             ex.printStackTrace();
         }
+    }
+
+    private boolean isCorrectPhoneNumber(String phone){
+        int length = phone.length();
+        if (length != 10)
+            return false;
+
+        char ch;
+        for (int i = 0; i < length; i++) {
+            ch = phone.charAt(i);
+            if (ch < 48 || ch > 57)
+                return false;
+        }
+        return true;
     }
 
     private void deleteUserFromDatabase(int userId){
@@ -465,20 +471,30 @@ public class MainFrame extends JDialog{
     }
 
     private void fillCbGenre(){
+        ArrayList<String> allGenres = getAllGenresFromDatabase();
+        cbGenres.addItem(NO_GENRE_MATTER);
+        for(String genre : allGenres){
+            cbGenres.addItem(genre);
+        }
+    }
+
+    private ArrayList<String> getAllGenresFromDatabase(){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
             Statement statement = connection.createStatement()){
 
+            ArrayList<String> genres = new ArrayList<>();
             final String query = "select name from genres";
             ResultSet res = statement.executeQuery(query);
 
-            cbGenres.addItem(NO_GENRE_MATTER);
             while(res.next())
-                cbGenres.addItem(res.getString("name"));
+                genres.add(res.getString("name"));
+            return genres;
 
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
             ex.printStackTrace();
         }
+        return null;
     }
 
     private ArrayList<Book> convertIntoBookArray(HashMap<BookInfoWithoutGenres, ArrayList<String>> books){
@@ -573,7 +589,7 @@ public class MainFrame extends JDialog{
         return null;
     }
 
-    private void createSessionsTable(){
+    private void createSessionsPanel(){
 
         DefaultTableModel model = new DefaultTableModel();
         JTable sessionsTable = new JTable(model){
@@ -727,6 +743,7 @@ public class MainFrame extends JDialog{
                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
        sp.setWheelScrollingEnabled(false);
        MainCardCenterPanel.add(sp, BorderLayout.CENTER);
+       MainCardCenterPanel.add(tfText, BorderLayout.NORTH);
        MainCardCenterPanel.updateUI();
     }
 
@@ -780,7 +797,7 @@ public class MainFrame extends JDialog{
         }
     }
 
-    private void restoreButtons(){
+    private void restoreBookList(){
         String imagepath;
         for(int i = 0; i < allBooksFromDB.length; i++){
             imagepath = allBooksFromDB[i].getImagepath();
@@ -803,20 +820,18 @@ public class MainFrame extends JDialog{
     }
 
 
-    private void displayButtonsOnPanel(Book[] books){
-        int num = books.length;
-
-        JPanel panel = new JPanel();
-
+    private void createBookListPanel(){
+        int num = allBooksFromDB.length;
         int numOfRows = calculateRowsNum(num);
 
+        JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(numOfRows, 2));
 
         bookButtons = new JButton[num];
         for(int i = 0; i < num; i++){
             bookButtons[i] = new JButton();
             final JButton btn = bookButtons[i];
-            final Book book = books[i];
+            final Book book = allBooksFromDB[i];
 
             btn.setMinimumSize(new Dimension(200, 200));
             btn.setMaximumSize(new Dimension(300, 300));
@@ -853,19 +868,21 @@ public class MainFrame extends JDialog{
 
         }
 
-        JScrollPane catalogue = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane catalogue = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         catalogue.setWheelScrollingEnabled(false);
 
-        pnlCardLibrary.setLayout(new BorderLayout());
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.setBackground(new Color(150, 75, 213));
         topPanel.setPreferredSize(new Dimension(800, 40));
+
         tfSearch.setPreferredSize(new Dimension(200, 25));
         cbGenres.setPreferredSize(new Dimension(200, 25));
+
         topPanel.add(tfSearch);
         topPanel.add(cbGenres);
 
-
+        pnlCardLibrary.setLayout(new BorderLayout());
         pnlCardLibrary.add(catalogue, BorderLayout.CENTER);
         pnlCardLibrary.add(topPanel, BorderLayout.NORTH);
     }
