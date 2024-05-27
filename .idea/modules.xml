@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/OPD_project.iml" filepath="$PROJECT_DIR$/OPD_project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LibOP.iml" filepath="$PROJECT_DIR$/LibOP.iml" />
     </modules>
   </component>
 </project>

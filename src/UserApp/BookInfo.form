@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="UserApp.BookInfo">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="10">
+    <constraints>
+      <xy x="20" y="20" width="691" height="502"/>
+    </constraints>
+    <properties>
+      <background color="-1384771"/>
+      <opaque value="true"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="2a7b" binding="southPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties>
+          <background color="-4350990"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="ed708" class="javax.swing.JButton" binding="btnPlanSession">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <background color="-12032014"/>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-855310"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <opaque value="false"/>
+              <preferredSize width="315" height="30"/>
+              <text value="Запланировать сеанс"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="5bfab" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints border-constraint="Center"/>
+        <properties>
+          <opaque value="false"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <scrollpane id="db8ea">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <background color="-1721230"/>
+              <horizontalScrollBarPolicy value="31"/>
+              <opaque value="false"/>
+              <verticalScrollBarPolicy value="22"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <grid id="22491" binding="pnlCenter" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="20">
+                <margin top="10" left="0" bottom="0" right="0"/>
+                <constraints/>
+                <properties>
+                  <background color="-1384771"/>
+                  <opaque value="true"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="be6b7" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="5" bottom="0" right="0"/>
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="-1" height="200"/>
+                      </grid>
+                    </constraints>
+                    <properties>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="462b5" class="javax.swing.JLabel" binding="lbName">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="20"/>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="21032" class="javax.swing.JLabel" binding="lbAuthor">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="20"/>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="d4aa9" class="javax.swing.JLabel" binding="lbYear">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="20"/>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="2d382" class="javax.swing.JLabel" binding="lbGenre">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="20"/>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="9d525" class="javax.swing.JLabel" binding="lbRating">
+                        <constraints>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="20"/>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="3c316" binding="pnlDescr" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="315" height="250"/>
+                      </grid>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="5fe9" class="javax.swing.JTextArea" binding="taDescription">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <opaque value="false"/>
+                          <preferredSize width="-1" height="-1"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

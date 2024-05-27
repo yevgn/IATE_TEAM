@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="UserApp.MainFrame">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="1076" height="740"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <splitpane id="18af7">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <continuousLayout value="false"/>
+          <dividerSize value="1"/>
+          <enabled value="false"/>
+          <preferredSize width="300" height="124"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="c162d" layout-manager="GridLayoutManager" row-count="8" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
+            <margin top="10" left="10" bottom="10" right="10"/>
+            <constraints>
+              <splitpane position="left"/>
+            </constraints>
+            <properties>
+              <background color="-8844587"/>
+              <opaque value="true"/>
+              <preferredSize width="300" height="124"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <vspacer id="ffbce">
+                <constraints>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </vspacer>
+              <grid id="7878c" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="c9cc2" class="javax.swing.JComboBox" binding="cbGenres">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <model/>
+                    </properties>
+                  </component>
+                  <component id="8a193" class="javax.swing.JTextField" binding="tfSearch">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="-1"/>
+                      </grid>
+                    </constraints>
+                    <properties>
+                      <font size="14" style="2"/>
+                      <opaque value="true"/>
+                      <text value="Поиск "/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="b371e" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                  <opaque value="false"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="55f51" class="javax.swing.JButton" binding="btnMain">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <opaque value="false"/>
+                      <text value="Главная"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="25503" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                  <opaque value="false"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="c657a" class="javax.swing.JButton" binding="btnProfile">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <opaque value="false"/>
+                      <text value="Профиль"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="55c79" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                  <opaque value="false"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="b7740" class="javax.swing.JButton" binding="btnLibrary">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <opaque value="false"/>
+                      <text value="Библиотека"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="fd273" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                  <opaque value="false"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="e28ea" class="javax.swing.JButton" binding="btnPlannedSessions">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-855310"/>
+                      <opaque value="false"/>
+                      <text value="Запланированные сеансы"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="810c9" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-10155343"/>
+                  <opaque value="false"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="4c38" class="javax.swing.JButton" binding="btnHelp">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13152526"/>
+                      <borderPainted value="false"/>
+                      <contentAreaFilled value="false"/>
+                      <focusPainted value="false"/>
+                      <font size="18"/>
+                      <foreground color="-986384"/>
+                      <opaque value="false"/>
+                      <text value="Помощь"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <vspacer id="54efd">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </vspacer>
+            </children>
+          </grid>
+          <grid id="577c4" binding="pnlCards" layout-manager="CardLayout" hgap="0" vgap="0">
+            <constraints>
+              <splitpane position="right"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="d694" binding="pnlCardProfile" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="10" left="10" bottom="10" right="10"/>
+                <constraints>
+                  <card name="pnlCardProfile"/>
+                </constraints>
+                <properties>
+                  <autoscrolls value="false"/>
+                  <background color="-1384771"/>
+                </properties>
+                <border type="none" title=""/>
+                <children>
+                  <vspacer id="18eeb">
+                    <constraints>
+                      <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                  </vspacer>
+                  <grid id="333dd" binding="pnlEditData" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="6903b" class="javax.swing.JButton" binding="btnChangeInfo">
+                        <constraints border-constraint="West"/>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <font size="14"/>
+                          <opaque value="true"/>
+                          <text value="Редактировать данные"/>
+                        </properties>
+                      </component>
+                      <component id="611f2" class="javax.swing.JLabel" binding="labelPopUpHint">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <foreground color="-41363"/>
+                          <text value="Введите новые данные и нажмите &quot;ENTER&quot;"/>
+                          <visible value="false"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="ff721" binding="pnlChangePassw" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="8f7cd" class="javax.swing.JButton" binding="btnChangePassword">
+                        <constraints border-constraint="West"/>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <font size="14"/>
+                          <opaque value="true"/>
+                          <text value="Изменить пароль"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="67266" layout-manager="FlowLayout" hgap="10" vgap="10" flow-align="1">
+                    <constraints>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="7e140" class="javax.swing.JButton" binding="btnLogOut">
+                        <constraints/>
+                        <properties>
+                          <contentAreaFilled value="true"/>
+                          <focusPainted value="false"/>
+                          <opaque value="false"/>
+                          <preferredSize width="350" height="30"/>
+                          <text value="Выйти из аккаунта"/>
+                        </properties>
+                      </component>
+                      <component id="ddea" class="javax.swing.JButton" binding="btnDeleteAccount">
+                        <constraints/>
+                        <properties>
+                          <focusPainted value="false"/>
+                          <opaque value="false"/>
+                          <preferredSize width="350" height="30"/>
+                          <text value="Удалить аккаунт"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="47efb" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="0" bottom="0" right="0"/>
+                    <constraints>
+                      <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="87bb1" class="javax.swing.JPasswordField" binding="pfPassword">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <preferredSize width="279" height="30"/>
+                        </properties>
+                      </component>
+                      <component id="7e376" class="javax.swing.JLabel" binding="labelEnterPassword">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <text value="Придумайте новый пароль"/>
+                        </properties>
+                      </component>
+                      <component id="2ebff" class="javax.swing.JLabel" binding="labelRepeatPassword">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <text value="Повторите пароль"/>
+                        </properties>
+                      </component>
+                      <component id="cfb3f" class="javax.swing.JPasswordField" binding="pfPassword1">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <preferredSize width="279" height="30"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="eba79" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="20">
+                    <margin top="0" left="0" bottom="20" right="0"/>
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <background color="-986384"/>
+                      <foreground color="-394497"/>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="a4d14" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="16"/>
+                          <text value="ID:"/>
+                        </properties>
+                      </component>
+                      <component id="a2ac3" class="javax.swing.JTextField" binding="tfID">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <background color="-855310"/>
+                          <editable value="false"/>
+                          <font size="16"/>
+                          <opaque value="false"/>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                      <component id="f6a74" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="16"/>
+                          <text value="Телефон: +7"/>
+                        </properties>
+                      </component>
+                      <component id="fe249" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="16"/>
+                          <text value="ФИО: "/>
+                          <verticalAlignment value="0"/>
+                          <verticalTextPosition value="0"/>
+                        </properties>
+                      </component>
+                      <component id="919ba" class="javax.swing.JTextField" binding="tfFullName">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                          <focusable value="true"/>
+                          <font size="18"/>
+                          <opaque value="false"/>
+                          <text value=""/>
+                          <visible value="true"/>
+                        </properties>
+                      </component>
+                      <component id="af9df" class="javax.swing.JTextField" binding="tfPhone">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                          <font size="16"/>
+                          <opaque value="false"/>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                      <component id="28624" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="16"/>
+                          <text value="Email: "/>
+                        </properties>
+                      </component>
+                      <component id="af9e4" class="javax.swing.JTextField" binding="tfEmail">
+                        <constraints>
+                          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                          <font size="16"/>
+                          <opaque value="false"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+              <grid id="7156f" binding="pnlCardLibrary" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <card name="pnlCardLibrary"/>
+                </constraints>
+                <properties>
+                  <background color="-855310"/>
+                </properties>
+                <border type="none"/>
+                <children/>
+              </grid>
+              <grid id="56a30" binding="pnlCardPlannedSessions" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <card name="pnlCardPlannedSessions"/>
+                </constraints>
+                <properties>
+                  <background color="-855310"/>
+                  <opaque value="true"/>
+                </properties>
+                <border type="none"/>
+                <children/>
+              </grid>
+              <grid id="8f925" binding="pnlCardHelp" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <card name="pnlCardHelp"/>
+                </constraints>
+                <properties>
+                  <background color="-1384771"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="4a65f" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <font size="16"/>
+                      <opaque value="false"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <grid id="c31f7" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="10" bottom="10" right="0"/>
+                        <constraints border-constraint="South"/>
+                        <properties>
+                          <opaque value="false"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <component id="76596" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <font size="16"/>
+                              <foreground color="-16777216"/>
+                              <icon value="images/icons8-aim-64-2.png"/>
+                              <text value="   Обнинск, ул. Энгельса, 14 "/>
+                            </properties>
+                          </component>
+                          <component id="3e901" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <font size="16"/>
+                              <foreground color="-16777216"/>
+                              <text value="                    График работы : Пн- Вс 8:00 - 20:00"/>
+                            </properties>
+                          </component>
+                          <component id="fdf0c" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <font size="16"/>
+                              <foreground color="-16777216"/>
+                              <text value="Связь с командой: +79208800522"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                      <component id="9066e" class="javax.swing.JTextArea" binding="taHelp">
+                        <constraints border-constraint="West"/>
+                        <properties>
+                          <editable value="false"/>
+                          <font size="16"/>
+                          <margin top="10" left="10" bottom="10" right="10"/>
+                          <opaque value="false"/>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+              <grid id="79900" binding="pnlCardMain" layout-manager="BorderLayout" hgap="20" vgap="20">
+                <constraints>
+                  <card name="pnlCardMain"/>
+                </constraints>
+                <properties>
+                  <background color="-1384771"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="ab1e5" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="North"/>
+                    <properties>
+                      <background color="-1384771"/>
+                      <opaque value="true"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <grid id="c57b8" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="5" left="20" bottom="0" right="0"/>
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <background color="-4490510"/>
+                          <opaque value="false"/>
+                          <preferredSize width="443" height="80"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <component id="d9acc" class="javax.swing.JLabel" binding="tfGreeting">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-4490510"/>
+                              <font size="28"/>
+                              <foreground color="-16777216"/>
+                              <text value="Главная страница"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                    </children>
+                  </grid>
+                  <grid id="e828d" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <background color="-1515843"/>
+                      <opaque value="true"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <grid id="6f3b8" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="10" left="10" bottom="20" right="10"/>
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <autoscrolls value="false"/>
+                          <background color="-4490510"/>
+                          <foreground color="-855310"/>
+                          <opaque value="false"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <component id="58637" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-3157774"/>
+                              <font size="18"/>
+                              <foreground color="-16777216"/>
+                              <icon value="images/icons8-aim-64-2.png"/>
+                              <opaque value="false"/>
+                              <text value="Обнинск, ул. Энгельса, 14"/>
+                            </properties>
+                          </component>
+                          <component id="6f5af" class="javax.swing.JLabel" binding="labelBooksAvailable">
+                            <constraints>
+                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-3157774"/>
+                              <font size="18"/>
+                              <foreground color="-16777216"/>
+                              <icon value="images/icons8-book-50.png"/>
+                              <text value="Доступно книг :"/>
+                            </properties>
+                          </component>
+                          <component id="27c35" class="javax.swing.JLabel" binding="labelUsersForMonth">
+                            <constraints>
+                              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-3157774"/>
+                              <font size="18"/>
+                              <foreground color="-16777216"/>
+                              <opaque value="false"/>
+                              <text value="              +7 484 584 02 70"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                    </children>
+                  </grid>
+                  <grid id="f063" binding="MainCardCenterPanel" layout-manager="BorderLayout" hgap="0" vgap="30">
+                    <constraints border-constraint="Center"/>
+                    <properties>
+                      <alignmentX value="0.5"/>
+                      <background color="-855310"/>
+                      <opaque value="false"/>
+                      <preferredSize width="850" height="50"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="76f92" class="javax.swing.JLabel" binding="tfText">
+                        <constraints border-constraint="North"/>
+                        <properties>
+                          <font size="22"/>
+                          <foreground color="-16777216"/>
+                          <horizontalAlignment value="2"/>
+                          <horizontalTextPosition value="0"/>
+                          <text value="Рекомендации на основе ваших предпочтений"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </splitpane>
+    </children>
+  </grid>
+</form>
