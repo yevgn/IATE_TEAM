@@ -807,15 +807,10 @@ public class MainFrame extends JDialog{
         int num = books.length;
 
         JPanel panel = new JPanel();
-        // panel.setBorder(BorderFactory.createLineBorder(Color.red));
+
         int numOfRows = calculateRowsNum(num);
 
-        // 7 рядов - высота - 2000
-       // int panelHeight = calculateCataloguePanelHeight(numOfRows);
-
-      //  panel.setPreferredSize(new Dimension(800, panelHeight));
         panel.setLayout(new GridLayout(numOfRows, 2));
-
 
         bookButtons = new JButton[num];
         for(int i = 0; i < num; i++){
@@ -826,13 +821,11 @@ public class MainFrame extends JDialog{
             btn.setMinimumSize(new Dimension(200, 200));
             btn.setMaximumSize(new Dimension(300, 300));
             btn.setPreferredSize(new Dimension(250, 250));
-            //btn.setText(book.getName() + ". " + book.getAuthor());
-          //  btn.setIcon(new ImageIcon(book.getImagepath(), book.getImagepath()));
+
             btn.setIcon(new ImageIcon(book.getImagepath()));
             btn.setContentAreaFilled(false);
-            //btn.setBorderPainted(false);
+
             btn.setOpaque(true);
-            //btn.setBackground(new Color(55, 78, 242));
 
             btn.addMouseListener(new MouseAdapter() {
                 Color oldColor = btn.getBackground();
@@ -917,12 +910,5 @@ public class MainFrame extends JDialog{
     public int getUserId(){
         return user.getId();
     }
-
-    private int calculateCataloguePanelHeight(final int numOfRows){
-        // 7 рядов - 2000
-        // numOfRows рядов - x
-        return (int) 2000*numOfRows/7;
-    }
-
 
 }
