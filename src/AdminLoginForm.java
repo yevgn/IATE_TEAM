@@ -15,7 +15,7 @@ public class AdminLoginForm extends JDialog {
         setContentPane(panel1);
         setLocation(500, 250);
         setModal(true);
-        setSize(new Dimension(400, 250));
+        setSize(new Dimension(350, 250));
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -30,7 +30,7 @@ public class AdminLoginForm extends JDialog {
                     showErrorMessage("Неправильные данные!", "Ошибка!");
                 } else{
                     dispose();
-                    AdminMainFrame adminMainFrame = new AdminMainFrame(null);
+                    createAdminMainFrame();
                 }
             }
         });
@@ -51,6 +51,10 @@ public class AdminLoginForm extends JDialog {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    private AdminMainFrame createAdminMainFrame(){
+        return new AdminMainFrame(null);
     }
 
     private void showErrorMessage(String message, String title){

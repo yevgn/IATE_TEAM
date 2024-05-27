@@ -1,22 +1,26 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class addBookForm extends JDialog {
     private JTextField tfName;
-    private JTextField tfAuthor;
+    private JTextField tfAuthorName;
     private JTextField tfYearOfPublishing;
     private JTextField tfGenre;
     private JTextField tfRating;
-    private JTextField tfImagePath;
     private JTextArea taDescription;
     private JButton btnAdd;
     private JPanel panel1;
+    private JButton btnChooseImage;
+    private JTextField tfAuthorSurname;
+    private String imagepath = "";
 
-    public addBookForm(JFrame parent, DefaultTableModel model){
+    public addBookForm(JFrame parent, DefaultTableModel model, ArrayList<Book> books){
         super(parent);
         setContentPane(panel1);
         setLocation(500, 250);
@@ -29,27 +33,17 @@ public class addBookForm extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = tfName.getText();
-                String author = tfAuthor.getText();
+                String authorName = tfAuthorName.getText();
+                String authorSurname = tfAuthorSurname.getText();
                 String yearOfPublishing = tfYearOfPublishing.getText();
-
-                String[] genres = tfGenre.getText().split(", ");
-                String genre = "";
-                if(genres.length != 1){
-                    for(int i = 0; i < genres.length; i++){
-                        if(i == genres.length - 1){
-                            genre += genres[i];
-                        } else{
-                            genre += genres[i] + "\n";
-                        }
-                    }
-                } else
-                    genre = genres[0];
                 String rating = tfRating.getText();
-                String imagePath = tfImagePath.getText();
                 String description = taDescription.getText();
 
-                if(name.isEmpty() || author.isEmpty() || genre.isEmpty() || rating.isEmpty() || yearOfPublishing.isEmpty() ||
-                    imagePath.isEmpty() || description.isEmpty())
+                String[] genres = tfGenre.getText().split(", ");
+
+                if(name.isEmpty() || authorName.isEmpty() ||  authorSurname.isEmpty() || genres.length == 0 ||
+                        rating.isEmpty() || yearOfPublishing.isEmpty() ||
+                    imagepath.isEmpty() || description.isEmpty())
                     showErrorMessage("Поля остались незаполненными!", "Ошибка!");
                 else if(!checkIfYearIsCorrect(yearOfPublishing))
                     showErrorMessage("Неправильно введен год издания!", "Ошибка!");
@@ -58,11 +52,29 @@ public class addBookForm extends JDialog {
                 else if(checkIfBookExistsInDatabase(name))
                     showErrorMessage("Книга с таким названием уже существует!", "Ошибка!");
                 else { // добавляем книгу в базу и таблицу
-                    addBookToDatabase(name, author,Integer.parseInt(yearOfPublishing), genre, Float.parseFloat(rating), imagePath, description);
-                    Object[] newRow = {name, author, yearOfPublishing, rating, tfGenre.getText(), imagePath};
+                    addBookToDatabase(name, authorName, authorSurname, Integer.parseInt(yearOfPublishing), genres,
+                            Float.parseFloat(rating), imagepath, description);
+                    Object[] newRow = {name, authorName + " " + authorSurname, yearOfPublishing, rating, tfGenre.getText(), imagepath};
                     model.addRow(newRow);
-                    showInformationMessage("Успех!", "");
+                    books.add(new Book(name, authorName, authorSurname, Integer.parseInt(yearOfPublishing),
+                            description, imagepath, Float.parseFloat(rating),
+                            genres));
+                    showInformationMessage("Книга успешно добавлена!", "Сообщение");
                     dispose();
+                }
+            }
+        });
+
+        btnChooseImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "PNG images", "png");
+                chooser.setFileFilter(filter);
+                int returnVal = chooser.showOpenDialog(null);
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    imagepath = chooser.getSelectedFile().getPath();
                 }
             }
         });
@@ -88,17 +100,46 @@ public class addBookForm extends JDialog {
         }
     }
 
-    private void addBookToDatabase(String name, String author, int yearOfPublishing, String genre, float rating, String imagePath, String description){
+    private void addBookToDatabase(String bookName, String authorName, String authorSurname,
+                                   int yearOfPublishing, String[] genres, float rating, String imagePath, String description){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
             Statement statement =connection.createStatement()){
 
-            String query = "insert into books (name, author, yearofpublishing, genre, rating, imagepath, description) values ('" + name + "', '" + author +
-                    "', '" + yearOfPublishing + "', '" + genre + "', '" + rating + "', '" + imagePath + "', '" + description + "');";
-            statement.executeUpdate(query);
+            int authorID = addAuthorToDatabase(authorName, authorSurname);
+
+            final String QUERY = "insert into books (name, author_id, year_publish, rating, imagepath, description) " +
+                    "values('" + bookName + "', '" + authorID + "', '" + yearOfPublishing + "', '" + rating + "', '"
+                    + imagePath + "', '" + description + "');";
+            statement.executeUpdate(QUERY);
+
+            for(String genre : genres) {
+                final String QUERY_1 = "insert into book_genre (book_id, genre_id) values ((select id from books where name = '"
+                        + bookName + "'), (select id from genres where name = '" + genre + "'));";
+                statement.executeUpdate(QUERY_1);
+            }
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
             ex.printStackTrace();
         }
+    }
+
+    private Integer addAuthorToDatabase(String authorName, String authorSurname){
+        try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+            Statement statement =connection.createStatement()){
+
+            final String QUERY = "insert into authors (name, surname) values ('" + authorName + "', '" + authorSurname + "');";
+            statement.executeUpdate(QUERY);
+
+            final String QUERY_1 = "select id from authors where name = '" + authorName + "' and surname = '" + authorSurname + "';" ;
+            ResultSet res = statement.executeQuery(  QUERY_1);
+            if(res.next())
+                return res.getInt("id");
+
+        } catch (SQLException ex){
+            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     private boolean checkIfBookExistsInDatabase(String name){

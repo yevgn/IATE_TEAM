@@ -1,7 +1,6 @@
-import java.util.Arrays;
 import java.util.Objects;
 
-public class Book {
+public class BookInfoWithoutGenres {
     private String name;
     private String authorName;
     private String authorSurname;
@@ -9,12 +8,11 @@ public class Book {
     private String description;
     private String imagepath;
     private float rating;
-    private String[] genres;
 
-    public Book(){}
+    public BookInfoWithoutGenres(){}
 
-    public Book(String name, String authorName, String authorSurname,
-                int yearOfPublishing, String description, String imagepath, float rating, String[] genres) {
+    public BookInfoWithoutGenres(String name, String authorName, String authorSurname,
+                int yearOfPublishing, String description, String imagepath, float rating) {
         this.name = name;
         this.authorName = authorName;
         this.authorSurname = authorSurname;
@@ -23,13 +21,11 @@ public class Book {
         this.description = description;
         this.imagepath = imagepath;
         this.rating = rating;
-        this.genres = genres;
     }
 
     public String getName() {
         return name;
     }
-
 
     public String getAuthorSurname() {
         return authorSurname;
@@ -63,14 +59,9 @@ public class Book {
         return rating;
     }
 
-    public String[] getGenres() {
-        return genres;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
-
 
     public void setYearOfPublishing(int yearOfPublishing) {
         this.yearOfPublishing = yearOfPublishing;
@@ -88,20 +79,16 @@ public class Book {
         this.rating = rating;
     }
 
-    public void setGenres(String[] genres) {
-        this.genres = genres;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Book book = (Book) o;
-        return yearOfPublishing == book.yearOfPublishing && Float.compare(rating, book.rating) == 0 && Objects.equals(name, book.name) && Objects.equals(authorName, book.authorName) && Objects.equals(authorSurname, book.authorSurname) && Objects.equals(description, book.description) && Objects.deepEquals(genres, book.genres);
+        BookInfoWithoutGenres that = (BookInfoWithoutGenres) o;
+        return yearOfPublishing == that.yearOfPublishing && Float.compare(rating, that.rating) == 0 && Objects.equals(name, that.name) && Objects.equals(authorName, that.authorName) && Objects.equals(authorSurname, that.authorSurname) && Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, authorName, authorSurname, yearOfPublishing, description, rating, Arrays.hashCode(genres));
+        return Objects.hash(name, authorName, authorSurname, yearOfPublishing, description, rating);
     }
 }

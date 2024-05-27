@@ -65,6 +65,7 @@ public class LoginForm extends JDialog{
                                 String name = res.getString("name");
                                 String surname = res.getString("surname");
                                 String patronymic = res.getString("patronymic");
+                                patronymic = patronymic.equals("null") ? null : patronymic;
                                 String phone = res.getString("phone");
                                 int age = res.getInt("age");
                                 user = new User(id, name, surname, patronymic, phone, email, password, age);

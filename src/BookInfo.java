@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,9 +17,21 @@ public class BookInfo extends JDialog {
     private JLabel lbYear;
     private JLabel lbGenre;
     private JLabel lbRating;
+    private JPanel pnlDescr;
+    private JPanel pnlCenter;
+    private JPanel southPanel;
+    private JLabel lbDescr;
+    private final String GENRES_LABEL = "Жанры: ";
+    private final String NAME_LABEL  = "Название: ";
+    private final String AUTHOR_LABEL = "Автор: ";
+    private final String RATING_LABEL = "Оценка (Литрес): ";
+    private String YEAR_LABEL = "Год издания: ";
+    final int numOfLettersInOneString = 120;
+    Book book;
 
     public BookInfo(JFrame parent, Book book, int userId){
         super(parent);
+        setTitle("Информация о книге");
         setContentPane(panel1);
         setLocation(500, 250);
         setModal(true);
@@ -25,27 +39,30 @@ public class BookInfo extends JDialog {
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        pnlDescr.setBorder(new RoundedBorder(10));
+        pnlCenter.setBorder(new EmptyBorder(0, 20, 0, 20));
+        taDescription.setEditable(false);
 
-        lbName.setText(book.getName());
-        lbAuthor.setText("Автор : " + book.getAuthor());
-        lbYear.setText("Год издания : " + String.valueOf(book.getYearOfPublishing()));
-        lbRating.setText("Оценка (ЛитРес) : " + String.valueOf(book.getRating()));
-        String[] genres = book.getGenre().split("\n");
-        String genre = "Жанры : ";
+        this.book = book;
+        lbName.setText(NAME_LABEL + book.getName());
+        lbAuthor.setText(AUTHOR_LABEL + book.getAuthorName() + " " + book.getAuthorSurname());
+        lbYear.setText(YEAR_LABEL + String.valueOf(book.getYearOfPublishing()));
+        lbRating.setText(RATING_LABEL + String.valueOf(book.getRating()));
+
+        String[] genres = book.getGenres();
+        String genre = "";
         for(int i = 0; i < genres.length; i++){
             if(i == genres.length - 1)
                 genre = genre.concat(genres[i]);
             else
                 genre = genre.concat(genres[i] + ", ");
         }
-        lbGenre.setText(genre);
 
-        final int numOfLettersInOneString = 90;
+        lbGenre.setText(GENRES_LABEL + genre);
+
         StringBuilder description = new StringBuilder(book.getDescription());
-        divideByLines(description, numOfLettersInOneString);
+        divideByLines(description);
         taDescription.setText(description.toString());
-
-
 
         btnPlanSession.addMouseListener(new MouseAdapter() {
             @Override
@@ -71,7 +88,7 @@ public class BookInfo extends JDialog {
         setVisible(true);
     }
 
-    private void divideByLines(StringBuilder line, final int lettersNumInOneLine){
+    private void divideByLines(StringBuilder line){
         int i = 0;
         int pos = 0;
         char ch;
@@ -82,7 +99,7 @@ public class BookInfo extends JDialog {
                 continue;
             }
 
-            if( (i + 1) == 90) {
+            if( (i + 1) == numOfLettersInOneString) {
                 ch =  line.charAt(pos);
                 if(ch == ' ') {
                     line.insert(pos + 1, "\n");
@@ -108,15 +125,12 @@ public class BookInfo extends JDialog {
         }
     }
 
-    public String getBookName(){
-        return lbName.getText();
-    }
 
     private PlanSessionForm createPlanSessionForm(int userId){
         return new PlanSessionForm(null, this, userId);
     }
 
-    public String getBookAuthor(){
-        return lbAuthor.getText();
+    public Book getBook(){
+        return book;
     }
 }

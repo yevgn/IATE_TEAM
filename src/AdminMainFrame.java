@@ -1,7 +1,10 @@
+import org.postgresql.core.VisibleBufferedInputStream;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AdminMainFrame extends JDialog {
     private JPanel panel1;
@@ -28,9 +33,12 @@ public class AdminMainFrame extends JDialog {
     CardLayout cardLayout;
     String today;
     boolean allTimeSessionsWasClicked = false;
-    JTable users;
-    JScrollPane spUsers;
+    JTable usersTable;
     JTable tableBlackList;
+    private final String PHONE_NUM_BEGIN = "+7";
+    private ArrayList<SessionWithUserData> todaySessions = new ArrayList<>();
+    private final String SESSION_STATUS_COMPLETED = "завершена";
+    private ArrayList<Book> books = new ArrayList<>();
 
     public AdminMainFrame(JFrame parent){
         super(parent);
@@ -54,6 +62,7 @@ public class AdminMainFrame extends JDialog {
         JButton[] buttons = {btnTodaySessions, btnAllTimeSessions, btnUsers, btnBlackList, btnBookList};
         for(JButton btn : buttons){
             btn.addMouseListener(new MouseAdapter() {
+                Color oldColor = btn.getBackground();
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     btn.setBackground(new Color(153, 167, 242));
@@ -61,20 +70,20 @@ public class AdminMainFrame extends JDialog {
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    btn.setBackground(new Color(242, 242, 242));
+                    btn.setBackground(oldColor);
                 }
             });
         }
 
-        createTableSessions(today, true);
-        initializeCbDay();
-        createBookList();
-        createTableUsers();
-        createTableBlackList();
+        fillCbDay();
+        createBookListPanel();
 
         btnTodaySessions.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pnlTodaySessions.removeAll();
+                showTodaySessions();
+                pnlTodaySessions.updateUI();
                 cardLayout.show(pnlCards, "CardTodaySessions");
             }
         });
@@ -97,6 +106,7 @@ public class AdminMainFrame extends JDialog {
         btnUsers.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                createTableUsers();
                 cardLayout.show(pnlCards, "CardUsers");
             }
         });
@@ -104,6 +114,7 @@ public class AdminMainFrame extends JDialog {
         btnBlackList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                createTableBlackList();
                 cardLayout.show(pnlCards, "CardBlackList");
             }
         });
@@ -114,53 +125,152 @@ public class AdminMainFrame extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 if(allTimeSessionsWasClicked)
                     pnlAllTimeSessions.remove(1);
-                String date = (String) cbDay.getSelectedItem();
-                createTableSessions(date, false);
+
+               String date = (String)cbDay.getSelectedItem();
+
+                String month = date.substring(3);
+                 month = month.length() == 1 ? "0".concat(month) : month;
+                 String day =date.substring(0, 2) ;
+                 day = day.length() == 1 ? "0".concat(day) : day;
+
+
+                 final String QUERY = "select s.status AS status, (select extract(year from start_time)) AS year, " +
+                         "(select extract(month from start_time)) " +
+                         "AS month, (select extract(day from start_time)) AS day," +
+                         " (select name from books where id = s.book_id) AS book, (select surname from users where id = s.user_id)" +
+                         " AS user_surname," +
+                         " (select name from users where id = s.user_id) AS user_name," +
+                         " (select patronymic from users where id = s.user_id) " +
+                         "AS user_patronymic, (select phone from users where id = s.user_id) AS user_phone," +
+                         " (select extract(hour from s.start_time)) AS start_hour, (select extract(hour from s.end_time)) " +
+                         "AS end_hour from sessions s" +  " where (select extract(month from start_time)) = '"
+                         + month + "' and " +
+                         "(select extract(day from start_time)) = '" + day + "' order by start_time;";
+              ArrayList<SessionWithUserData> sessions = getSessionsFromDatabase(QUERY);
+              JTable table = createSessionTable(sessions);
+              JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+              pnlAllTimeSessions.add(sp, BorderLayout.CENTER);
+
+                pnlAllTimeSessions.updateUI();
                 allTimeSessionsWasClicked = true;
             }
         });
 
         setVisible(true);
 
+    }
+
+    private void showTodaySessions(){
+        final String QUERY = "select s.status AS status, (select extract(year from start_time)) AS year, " +
+                "(select extract(month from start_time)) " +
+                "AS month, (select extract(day from start_time)) AS day," +
+                " (select name from books where id = s.book_id) AS book, (select surname from users where id = s.user_id)" +
+                " AS user_surname," +
+                " (select name from users where id = s.user_id) AS user_name, (select patronymic from users where id = s.user_id) " +
+                "AS user_patronymic, (select phone from users where id = s.user_id) AS user_phone," +
+                " (select extract(hour from s.start_time)) AS start_hour, (select extract(hour from s.end_time)) " +
+                "AS end_hour from sessions s" +
+                " where (select extract(day from start_time)) = " +
+                " (select extract(day from current_timestamp)) order by start_time;";
+        todaySessions = getSessionsFromDatabase(QUERY);
+        JTable table = createSessionTable(todaySessions);
+
+        JButton btnMarkedCompleted = new JButton("Отметить завершенным");
+        btnMarkedCompleted.setFocusPainted(false);
+        btnMarkedCompleted.setEnabled(false);
+        pnlTodaySessions.add(btnMarkedCompleted, BorderLayout.SOUTH);
+
+
+        ListSelectionModel selModel = table.getSelectionModel();
+
+        selModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                btnMarkedCompleted.setEnabled(false);
+                int[] selectedRows = table.getSelectedRows();
+                if(selectedRows.length == 1)
+                    btnMarkedCompleted.setEnabled(true);
+            }
+        });
+
+        btnMarkedCompleted.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] selectedRows = table.getSelectedRows();
+                for (int i = 0; i < selectedRows.length; i++) {
+                    int selIndex = selectedRows[i];
+                    DefaultTableModel model = (DefaultTableModel) table.getModel();
+                    SessionWithUserData s = todaySessions.get(selIndex);
+
+                    String year = s.getYear();
+                    String month = s.getMonth();
+                    month = month.length() == 1 ? "0".concat(month) : month;
+                    String day = s.getDay();
+                    day = day.length() == 1 ? "0".concat(day) : day;
+                    String start_hour = s.getStartHour();
+                    start_hour = start_hour.length() == 1 ? "0".concat(start_hour) : start_hour;
+
+                    String start_time = year + "-" + month + "-" + day + " " + start_hour + ":00:00";
+                    setSessionCompletedInDatabase( s.getBookName() ,start_time);
+                    model.setValueAt("завершена", selIndex, 4);
+                    btnMarkedCompleted.setEnabled(false);
+                }
+            }
+        });
+
+        table.setFillsViewportHeight(true);
+        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pnlTodaySessions.add(sp, BorderLayout.CENTER);
 
     }
 
-    private void createBookList(){
+    private void setSessionCompletedInDatabase(String bookName, String startTime){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-                Statement statement = connection.createStatement()){
+            Statement statement = connection.createStatement()){
+            String query = "update sessions set status = '" + SESSION_STATUS_COMPLETED + "' where start_time = '" + startTime + "' " +
+                    "and book_id = (select id from books where name = '" + bookName + "');";
+           statement.executeUpdate(query);
 
-             DefaultTableModel model = new DefaultTableModel();
+        } catch (SQLException ex){
+            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
+            ex.printStackTrace();
+        }
+    }
+
+    private void createBookListPanel(){
+
+            DefaultTableModel model = new DefaultTableModel();
             JTable bookList = new JTable(model){
-                //private static final long serialVersionUID = 1L;
                 public boolean isCellEditable(int row, int col)
                 {
                     return false;
                 }
             };
             JPanel panel = new JPanel(new BorderLayout());
-            //panel.setOpaque(false);
 
             model.addColumn("Название");
             model.addColumn("Автор");
             model.addColumn("Год издетельства");
             model.addColumn("Средння оценка");
             model.addColumn("Жанр");
-            model.addColumn("Обложка");
 
             bookList.getColumnModel().getColumn(0).setPreferredWidth(300);
             bookList.getColumnModel().getColumn(1).setPreferredWidth(300);
-            bookList.getColumnModel().getColumn(2).setPreferredWidth(300);
-            bookList.getColumnModel().getColumn(3).setPreferredWidth(300);
+            bookList.getColumnModel().getColumn(2).setPreferredWidth(100);
+            bookList.getColumnModel().getColumn(3).setPreferredWidth(100);
             bookList.getColumnModel().getColumn(4).setPreferredWidth(400);
-            bookList.getColumnModel().getColumn(5).setPreferredWidth(300);
 
-            bookList.setRowHeight(20);
-            //bookList.setEnabled(false);
+            bookList.setRowHeight(40);
 
 
-            ResultSet res = statement.executeQuery("select name, author, yearofpublishing, rating, genre, imagepath from books;");
-            while(res.next()){
-                String[] genres = res.getString("genre").split("\n");
+            final String QUERY = "select b.name AS book, g.name AS genre, a.name AS author_name, a.surname AS author_surname," +
+                    " b.rating AS rating" +
+                    ", b.year_publish AS year, b.imagepath AS imagepath, b.description AS descr from book_genre bg join books b on" +
+                    " bg.book_id = b.id join genres g on g.id = bg.genre_id join authors a on a.id = b.author_id;";
+            books = getBookListFromDB(QUERY);
+
+            for(Book book : books){
+                String[] genres = book.getGenres();
                 String genre = "";
                 for(int i = 0; i < genres.length; i++){
                     if(i == genres.length - 1)
@@ -168,11 +278,18 @@ public class AdminMainFrame extends JDialog {
                     else
                         genre += genres[i] + ", ";
                 }
-                Object[] rowData = {res.getString("name"), res.getString("author"), res.getInt("yearofpublishing"),
-                                    res.getFloat("rating"), genre, res.getString("imagepath")};
-                model.addRow(rowData);
 
+                Object[] row = {book.getName(), book.getAuthorName() + " " + book.getAuthorSurname(),
+                    book.getYearOfPublishing(), book.getRating(), genre};
+                model.addRow(row);
             }
+
+            panel.add(bookList, BorderLayout.CENTER);
+            JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+              pnlBookList.add(sp, BorderLayout.CENTER);
+              sp.setWheelScrollingEnabled(false);
+
 
             JButton btnAddBook = new JButton("Добавить книгу");
             JButton btnDeleteBook = new JButton("Убрать книгу");
@@ -184,18 +301,14 @@ public class AdminMainFrame extends JDialog {
             pnlButtons.add(btnAddBook);
             pnlButtons.add(btnDeleteBook);
 
-            panel.add(bookList, BorderLayout.CENTER);
-            JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            pnlBookList.add(sp, BorderLayout.CENTER);
             pnlBookList.add(pnlButtons, BorderLayout.SOUTH);
 
             btnAddBook.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    createAddBookForm(model);
+                    createAddBookForm(model, books);
                 }
             });
-
 
             ListSelectionModel selModel = bookList.getSelectionModel();
 
@@ -216,32 +329,84 @@ public class AdminMainFrame extends JDialog {
                     DefaultTableModel model = (DefaultTableModel) bookList.getModel();
                     for(int i = 0; i < selectedRows.length; i++){
                         int selIndex = selectedRows[i];
-                        deleteBookFromDatabase( (String) model.getValueAt(selIndex, 0));
+                        deleteBookFromDatabase( books.get(selIndex).getName());
                         model.removeRow(selIndex);
+                        books.remove(selIndex);
                     }
                     btnDeleteBook.setEnabled(false);
                 }
             });
 
+
+    }
+
+
+    private ArrayList<Book> getBookListFromDB(final String QUERY){
+        try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+            Statement statement = connection.createStatement()){
+            HashMap<BookInfoWithoutGenres, ArrayList<String>> books = new HashMap<>();
+            BookInfoWithoutGenres bookWithoutGenres;
+
+            ResultSet res = statement.executeQuery(QUERY);
+
+            while(res.next()){
+                bookWithoutGenres = new BookInfoWithoutGenres();
+                bookWithoutGenres.setName(res.getString("book"));
+                bookWithoutGenres.setAuthorName(res.getString("author_name"));
+                bookWithoutGenres.setAuthorSurname(res.getString("author_surname"));
+                bookWithoutGenres.setYearOfPublishing(res.getInt("year"));
+                bookWithoutGenres.setDescription(res.getString("descr"));
+                bookWithoutGenres.setRating(res.getFloat("rating"));
+                bookWithoutGenres.setImagepath(res.getString("imagepath"));
+
+                ArrayList<String> val = books.get(bookWithoutGenres);
+                if(val == null){
+                    val = new ArrayList<>();
+                    val.add(res.getString("genre"));
+                    books.put(bookWithoutGenres, val);
+                } else val.add(res.getString("genre"));
+
+            }
+
+            return convertIntoBookArray(books);
+
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
             ex.printStackTrace();
         }
+        return null;
     }
 
-//    private void updateImagePathInDatabase(String imagepath, String name){
-//        try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-//                Statement statement = connection.createStatement()){
-//
-//            String query = "update books set imagepath = '" + imagepath + "' where name = '" + name + "';";
-//            statement.executeUpdate(query);
-//        } catch (SQLException ex){
-//            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-//            ex.printStackTrace();
-//        }
-//    }
+
+    private ArrayList<Book> convertIntoBookArray(HashMap<BookInfoWithoutGenres, ArrayList<String>> books){
+        ArrayList<Book> res = new ArrayList<>(books.size());
+        Book book;
+        BookInfoWithoutGenres key;
+        ArrayList<String> val;
+
+        for(Map.Entry<BookInfoWithoutGenres, ArrayList<String>> entry : books.entrySet()){
+            book = new Book();
+            key = entry.getKey();
+            val = entry.getValue();
+
+            book.setName(key.getName());
+            book.setAuthorName(key.getAuthorName());
+            book.setAuthorSurname(key.getAuthorSurname());
+            book.setDescription(key.getDescription());
+            book.setImagepath(key.getImagepath());
+            book.setRating(key.getRating());
+            book.setYearOfPublishing(key.getYearOfPublishing());
+            book.setGenres(val.toArray( new String[0]));
+
+            res.add(book);
+        }
+
+        return res;
+    }
 
     private void createTableUsers(){
+        pnlUsers.removeAll();
+
         DefaultTableModel model = new DefaultTableModel(){
 
             public boolean isCellEditable(int row, int col)
@@ -249,7 +414,7 @@ public class AdminMainFrame extends JDialog {
                 return false;
             }
         };
-        users = new JTable(model);
+        usersTable = new JTable(model);
         JPanel panel = new JPanel(new BorderLayout());
 
         model.addColumn("ID");
@@ -259,36 +424,28 @@ public class AdminMainFrame extends JDialog {
         model.addColumn("Телефон");
         model.addColumn("Email");
         model.addColumn("Возраст");
-        model.addColumn("Серия и номер паспорта");
-        model.addColumn("Кем выдан");
-        model.addColumn("Код подразделения");
-        model.addColumn("Дата выдачи");
-        model.addColumn("Статус");
+        model.addColumn("Блокировка");
 
-        users.getColumnModel().getColumn(0).setPreferredWidth(250);
-        users.getColumnModel().getColumn(1).setPreferredWidth(250);
-        users.getColumnModel().getColumn(2).setPreferredWidth(250);
-        users.getColumnModel().getColumn(3).setPreferredWidth(250);
-        users.getColumnModel().getColumn(4).setPreferredWidth(250);
-        users.getColumnModel().getColumn(5).setPreferredWidth(250);
-        users.getColumnModel().getColumn(6).setPreferredWidth(250);
-        users.getColumnModel().getColumn(7).setPreferredWidth(250);
-        users.getColumnModel().getColumn(8).setPreferredWidth(250);
-        users.getColumnModel().getColumn(9).setPreferredWidth(250);
-        users.getColumnModel().getColumn(10).setPreferredWidth(250);
-        users.getColumnModel().getColumn(11).setPreferredWidth(250);
-        users.setRowHeight(20);
+        usersTable.getColumnModel().getColumn(0).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(1).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(2).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(3).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(4).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(5).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(6).setPreferredWidth(250);
+        usersTable.getColumnModel().getColumn(7).setPreferredWidth(250);
+        usersTable.setRowHeight(30);
 
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
                 Statement statement = connection.createStatement()){
-            String query = "select * from users order by userid asc;";
+            String query = "select * from users order by id asc;";
             ResultSet res = statement.executeQuery(query);
 
             while(res.next()){
-                Object[] rowData = {res.getInt("userid"), res.getString("surname"), res.getString("name"),
-                res.getString("patronymic"), res.getString("phone"), res.getString("email"), res.getInt("age"),
-                res.getString("passportid"), res.getString("issuedby"), res.getString("departmentnumber"),
-                res.getString("dateofissue"), res.getInt("isblocked") == 1 ? "Заблокирован" : ""};
+                Object[] rowData = {res.getInt("id"), res.getString("surname"),
+                        res.getString("name"), res.getString("patronymic"),
+                        res.getString("phone"), res.getString("email"), res.getInt("age"),
+                res.getBoolean("is_blocked") ? "Заблокирован" : ""};
                 model.addRow(rowData);
             }
 
@@ -298,9 +455,9 @@ public class AdminMainFrame extends JDialog {
         }
 
 
-        panel.add(users, BorderLayout.CENTER);
+        panel.add(usersTable, BorderLayout.CENTER);
 
-        spUsers = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane spUsers = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pnlUsers.add(spUsers, BorderLayout.CENTER);
 
         JButton btnBanUser = new JButton("Заблокировать пользователя");
@@ -316,8 +473,8 @@ public class AdminMainFrame extends JDialog {
 
         JPanel pnlSearch = new JPanel(new FlowLayout());
         JTextField tfSearch = new JTextField();
-        JLabel labelSearch = new JLabel("Поиск по ID");
-        labelSearch.setPreferredSize(new Dimension(100, 20));
+        JLabel labelSearch = new JLabel("Поиск по Фамилии");
+        labelSearch.setPreferredSize(new Dimension(150, 20));
 
         tfSearch.setPreferredSize(new Dimension(100, 20));
 
@@ -329,42 +486,37 @@ public class AdminMainFrame extends JDialog {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    int id = -1;
-                    TableModel model = users.getModel();
-                    try{
-                       id = Integer.parseInt(tfSearch.getText());
-                    } catch (NumberFormatException ex) {
-                        showErrorMessage("Неправильно введен ID!", "Ошибка!");
-                    }
+                    String surnameToFind = tfSearch.getText();
+                    TableModel model = usersTable.getModel();
 
-                    int indexToScrollTo = 0;
-                    for(int i = 0; i < users.getRowCount(); i++){
-                        if(id == (Integer) model.getValueAt(i, 0)) {
-                            indexToScrollTo = i;
-                            break;
+                    if(surnameToFind != null && !surnameToFind.isEmpty()) {
+                        int indexToScrollTo = 0;
+                        for (int i = 0; i < usersTable.getRowCount(); i++) {
+                            if (surnameToFind.equals(model.getValueAt(i, 1))) {
+                                indexToScrollTo = i;
+                                break;
+                            }
                         }
+                        usersTable.changeSelection(indexToScrollTo, 0, false, false);
+                        int position = indexToScrollTo * usersTable.getRowHeight();
+                        JScrollBar sb = spUsers.getVerticalScrollBar();
+                        sb.setValue(position);
                     }
-
-                    users.changeSelection(indexToScrollTo, 0, false, false);
-                    int position = indexToScrollTo * users.getRowHeight();
-                    JScrollBar sb = spUsers.getVerticalScrollBar();
-                    sb.setValue(position);
-
                 }
             }
         });
 
-        ListSelectionModel selModel = users.getSelectionModel();
+        ListSelectionModel selModel = usersTable.getSelectionModel();
 
         selModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 btnBanUser.setEnabled(false);
                 btnUnbanUser.setEnabled(false);
-                int[] selectedRows = users.getSelectedRows();
+                int[] selectedRows = usersTable.getSelectedRows();
                 if(selectedRows.length == 1) {
                     int selIndex = selectedRows[0];
-                    DefaultTableModel model = (DefaultTableModel) users.getModel();
-                    if (model.getValueAt(selIndex, 11).equals("Заблокирован"))
+                    DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
+                    if (model.getValueAt(selIndex, 7).equals("Заблокирован"))
                         btnUnbanUser.setEnabled(true);
                     else
                         btnBanUser.setEnabled(true);
@@ -379,52 +531,41 @@ public class AdminMainFrame extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //должен поменять значение isblocked и удалить все сеансы этого пользователя в sessions
-                int[] selectedRows = users.getSelectedRows();
+                int[] selectedRows = usersTable.getSelectedRows();
                 int selIndex = selectedRows[0];
-                DefaultTableModel model = (DefaultTableModel) users.getModel();
+                DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
                 int userid =  (Integer) model.getValueAt(selIndex, 0);
                 banUser(userid);
                 deletePlannedSessions(userid);
-                model.setValueAt("Заблокирован", selIndex, 11);
+                model.setValueAt("Заблокирован", selIndex, 7);
                 btnBanUser.setEnabled(false);
-                //обновляю черный список
-                addToTableBlackList(userid, (String) model.getValueAt(selIndex, 1), (String)model.getValueAt(selIndex, 2),
-                        (String) model.getValueAt(selIndex, 3), (String)model.getValueAt(selIndex, 4),
-                        (String)model.getValueAt(selIndex, 5), (Integer) model.getValueAt(selIndex, 6),
-                        (String)model.getValueAt(selIndex, 7), (String)model.getValueAt(selIndex, 8),
-                        (String)model.getValueAt(selIndex, 9), (String)model.getValueAt(selIndex, 10)
-                );
+                pnlUsers.updateUI();
             }
         });
 
         btnUnbanUser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selectedRows = users.getSelectedRows();
+                int[] selectedRows = usersTable.getSelectedRows();
                 int selIndex = selectedRows[0];
-                DefaultTableModel model = (DefaultTableModel) users.getModel();
+                DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
                 int userid = (Integer) model.getValueAt(selIndex, 0);
                 unbanUser(userid);
-                model.setValueAt("", selIndex, 11);
+                model.setValueAt("", selIndex, 7);
                 btnUnbanUser.setEnabled(false);
-                deleteFromTableBlackList(userid);
+                pnlUsers.updateUI();
             }
         });
 
         pnlUsers.add(pnlButtons, BorderLayout.SOUTH);
+        pnlUsers.updateUI();
 
     }
 
-    private void deleteFromTableBlackList(int userId){
-        DefaultTableModel model =  (DefaultTableModel) tableBlackList.getModel();
-        for(int i = 0; i < tableBlackList.getRowCount(); i++){
-            if(userId == (Integer) model.getValueAt(i, 0)) {
-                model.removeRow(i);
-            }
-        }
-    }
 
     private void createTableBlackList(){
+        pnlBlackList.removeAll();
+
         DefaultTableModel model = new DefaultTableModel(){
             public boolean isCellEditable(int row, int col)
             {
@@ -441,10 +582,6 @@ public class AdminMainFrame extends JDialog {
         model.addColumn("Телефон");
         model.addColumn("Email");
         model.addColumn("Возраст");
-        model.addColumn("Серия и номер паспорта");
-        model.addColumn("Кем выдан");
-        model.addColumn("Код подразделения");
-        model.addColumn("Дата выдачи");
 
         tableBlackList.getColumnModel().getColumn(0).setPreferredWidth(250);
         tableBlackList.getColumnModel().getColumn(1).setPreferredWidth(250);
@@ -453,22 +590,18 @@ public class AdminMainFrame extends JDialog {
         tableBlackList.getColumnModel().getColumn(4).setPreferredWidth(250);
         tableBlackList.getColumnModel().getColumn(5).setPreferredWidth(250);
         tableBlackList.getColumnModel().getColumn(6).setPreferredWidth(250);
-        tableBlackList.getColumnModel().getColumn(7).setPreferredWidth(250);
-        tableBlackList.getColumnModel().getColumn(8).setPreferredWidth(250);
-        tableBlackList.getColumnModel().getColumn(9).setPreferredWidth(250);
-        tableBlackList.getColumnModel().getColumn(10).setPreferredWidth(250);
-        tableBlackList.setRowHeight(20);
+
+        tableBlackList.setRowHeight(30);
 
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
                 Statement statement = connection.createStatement()){
-            String query = "select * from users where isblocked = 1;";
-            ResultSet res = statement.executeQuery(query);
+            final String QUERY = "select * from users where is_blocked = true;";
+            ResultSet res = statement.executeQuery(QUERY);
 
             while(res.next()){
-                Object[] rowData = {res.getInt("userid"), res.getString("surname"), res.getString("name"),
-                        res.getString("patronymic"), res.getString("phone"), res.getString("email"), res.getInt("age"),
-                        res.getString("passportid"), res.getString("issuedby"), res.getString("departmentnumber"),
-                        res.getString("dateofissue")};
+                Object[] rowData = {res.getInt("id"), res.getString("surname"),
+                        res.getString("name"), res.getString("patronymic"),
+                        res.getString("phone"), res.getString("email"), res.getInt("age"),};
                 model.addRow(rowData);
             }
 
@@ -478,8 +611,8 @@ public class AdminMainFrame extends JDialog {
             pnlBlackList.add(sp, BorderLayout.CENTER);
 
             JPanel pnlSearch = new JPanel(new FlowLayout());
-            JLabel labelSearch = new JLabel("Поиск по ID");
-            labelSearch.setPreferredSize(new Dimension(100, 20));
+            JLabel labelSearch = new JLabel("Поиск по Фамилии");
+            labelSearch.setPreferredSize(new Dimension(150, 20));
             JTextField tfSearch = new JTextField();
             tfSearch.setPreferredSize(new Dimension(100, 20));
 
@@ -496,17 +629,12 @@ public class AdminMainFrame extends JDialog {
                 @Override
                 public void keyPressed(KeyEvent e) {
                     if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                        int id = -1;
+                        String surnameToFind = tfSearch.getText();
                         TableModel model = tableBlackList.getModel();
-                        try{
-                            id = Integer.parseInt(tfSearch.getText());
-                        } catch (NumberFormatException ex) {
-                            showErrorMessage("Неправильно введен ID!", "Ошибка!");
-                        }
 
                         int indexToScrollTo = 0;
                         for(int i = 0; i < tableBlackList.getRowCount(); i++){
-                            if(id == (Integer) model.getValueAt(i, 0)) {
+                            if( surnameToFind.equals(model.getValueAt(i, 1)))  {
                                 indexToScrollTo = i;
                                 break;
                             }
@@ -514,8 +642,8 @@ public class AdminMainFrame extends JDialog {
                         
 
                         tableBlackList.changeSelection(indexToScrollTo, 0, false, false);
-                        int position = indexToScrollTo * users.getRowHeight();
-                        JScrollBar sb = spUsers.getVerticalScrollBar();
+                        int position = indexToScrollTo * tableBlackList.getRowHeight();
+                        JScrollBar sb = sp.getVerticalScrollBar();
                         sb.setValue(position);
                     }
                 }
@@ -538,7 +666,6 @@ public class AdminMainFrame extends JDialog {
             });
 
 
-
             btnUnbanUser.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -549,7 +676,6 @@ public class AdminMainFrame extends JDialog {
                     unbanUser(userid);
                     defaultTableModel.removeRow(selIndex);
                     btnUnbanUser.setEnabled(false);
-                    updateTableUsers(userid);
                 }
             });
 
@@ -560,50 +686,17 @@ public class AdminMainFrame extends JDialog {
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
             ex.printStackTrace();
         }
+
+        pnlBlackList.updateUI();
     }
 
-    private void updateTableUsers(int userid){
-        DefaultTableModel defaultTableModel = (DefaultTableModel) users.getModel();
-        for(int i = 0; i < users.getRowCount(); i++){
-            if( (Integer) defaultTableModel.getValueAt(i, 0) == userid) {
-                defaultTableModel.setValueAt("", i,  11);
-                break;
-            }
-        }
-    }
-
-    private void addToTableBlackList(int id, String name, String surname, String patronymic, String phone, String email,
-                                      int age, String passportId, String issuedBy, String departmentNumber, String dateOfIssue){
-
-        DefaultTableModel defaultTableModel = (DefaultTableModel) tableBlackList.getModel();
-        Object[] rowData = {id, surname, name, patronymic, phone, email, age, passportId, issuedBy, departmentNumber, dateOfIssue};
-        defaultTableModel.addRow(rowData);
-    }
 
     private void deletePlannedSessions(int userid){ // если пользователь имел сеансы на этот день, то их удаляем и обновляем todaySessions
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
                 Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)){
 
-            String query = "select id, date, starttime, userarrived from sessions where userid = '" + userid + "';";
-            ResultSet res = statement.executeQuery(query);
-
-            while(res.next()){
-                String date = res.getString("date");
-                int startHour = Integer.parseInt(res.getString("starttime").substring(0, 2));
-                int code = isFollowingMoment(date, startHour);
-                if(code == 0)
-                    continue;
-                if(code == 2) { // он пришел
-                    res.updateInt("userarrived", 1);
-                    res.updateRow();
-                }
-                else{
-                    res.deleteRow();
-                }
-                pnlTodaySessions.removeAll();
-                createTableSessions(today, true);
-
-            }
+            final String QUERY = "delete from sessions where user_id = '" + userid + "' and start_time > current_timestamp;";
+            statement.executeUpdate(QUERY);
 
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
@@ -611,34 +704,12 @@ public class AdminMainFrame extends JDialog {
         }
     }
 
-    private int isFollowingMoment( String date, int startHour){
-        LocalDateTime currentMoment = LocalDateTime.now();
-        int currentDay = currentMoment.getDayOfMonth();
-        int currentMonth = currentMoment.getMonthValue();
-        int currentHour = currentMoment.getHour();
-        int month = Integer.parseInt( date.substring(3));
-        int day =  Integer.parseInt(date.substring(0, 2));
-
-        if(month > currentMonth)
-            return 1;
-        else if(month == currentMonth){
-            if(day > currentDay)
-                return 1;
-            else if(day == currentDay){
-                if(startHour == currentHour)
-                    return 2;
-                else if(startHour > currentHour)
-                    return 1;
-            }
-        }
-        return 0;
-    }
 
     private void unbanUser(int userid){
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
                 Statement statement = connection.createStatement()){
 
-            String query = "update users set isblocked = 0 where userid = '" + userid + "';";
+            String query = "update users set is_blocked = false where id = '" + userid + "';";
             statement.executeUpdate(query);
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
@@ -650,7 +721,7 @@ public class AdminMainFrame extends JDialog {
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
                 Statement statement = connection.createStatement()){
 
-            String query = "update users set isblocked = 1 where userid = '" + userid + "';";
+            String query = "update users set is_blocked = true where id = '" + userid + "';";
             statement.executeUpdate(query);
         } catch (SQLException ex){
             showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
@@ -658,8 +729,8 @@ public class AdminMainFrame extends JDialog {
         }
     }
 
-    private addBookForm createAddBookForm(DefaultTableModel model){
-        return new addBookForm(null,  model);
+    private addBookForm createAddBookForm(DefaultTableModel model, ArrayList<Book> books){
+        return new addBookForm(null,  model, books);
     }
 
     private void deleteBookFromDatabase(String name){
@@ -675,136 +746,89 @@ public class AdminMainFrame extends JDialog {
         }
     }
 
-    private void createTableSessions(String date, boolean isCardTodaySessions){
 
+    private ArrayList<SessionWithUserData> getSessionsFromDatabase(final String QUERY){
+        try (Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+             Statement statement = connection.createStatement()) {
+
+            ResultSet res = statement.executeQuery(QUERY);
+            ArrayList<SessionWithUserData> sessions = new ArrayList<>();
+            SessionWithUserData s;
+
+            while (res.next()) {
+                s = new SessionWithUserData();
+                s.setBookName(res.getString("book"));
+                s.setStartHour(res.getString("start_hour"));
+                s.setEndHour(res.getString("end_hour"));
+                s.setUserName(res.getString("user_name"));
+                s.setUserSurname(res.getString("user_surname"));
+                s.setYear(res.getString("year"));
+                s.setMonth(res.getString("month"));
+                s.setDay(res.getString("day"));
+                String userPatronymic = res.getString("user_patronymic");
+                s.setUserPatronymic(userPatronymic.equals("null") ? null : userPatronymic);
+                s.setStatus(res.getString("status"));
+
+                s.setUserPhone(res.getString("user_phone"));
+
+                sessions.add(s);
+            }
+            return sessions;
+        } catch (SQLException exception) {
+            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private JTable createSessionTable(ArrayList<SessionWithUserData> sessions){
         DefaultTableModel model = new DefaultTableModel();
-        JTable todaySessions = new JTable(model){
-
+        JTable table = new JTable(model){
             public boolean isCellEditable(int row, int col)
             {
                 return false;
             }
         };
-        JPanel panel = new JPanel(new BorderLayout());
-            //panel.setOpaque(false);
 
-            model.addColumn("Книга");
-            model.addColumn("Автор");
-            model.addColumn("Время");
-            model.addColumn("ФИО");
-            model.addColumn("ID пользователя");
-            model.addColumn("Номер и серия паспорта");
-            model.addColumn("Кем выдан");
-            model.addColumn("Код подразделения");
-            model.addColumn("Дата выдачи");
-            todaySessions.getColumnModel().getColumn(0).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(1).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(2).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(3).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(4).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(5).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(6).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(7).setPreferredWidth(250);
-            todaySessions.getColumnModel().getColumn(8).setPreferredWidth(250);
+        model.addColumn("Книга");
+        model.addColumn("Время");
+        model.addColumn("ФИО");
+        model.addColumn("Телефон");
+        model.addColumn("Статус сеанса");
 
-            todaySessions.setRowHeight(20);
+        table.getColumnModel().getColumn(0).setPreferredWidth(250);
+        table.getColumnModel().getColumn(1).setPreferredWidth(250);
+        table.getColumnModel().getColumn(2).setPreferredWidth(250);
+        table.getColumnModel().getColumn(3).setPreferredWidth(250);
+        table.getColumnModel().getColumn(4).setPreferredWidth(250);
 
-            //Object[] headers = {"Книга", "Автор", "Время", "ФИО", "ID пользователя", "Номер и серия паспорта", "Кем выдан", "Код подразделения", "Дата выдачи"};
-            // model.addRow(headers);
+        table.setRowHeight(30);
 
-            try (Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-                 Statement statement = connection.createStatement()) {
+        int i = 0;
+        for(SessionWithUserData s : sessions){
+            String startHour = s.getStartHour().length() == 1 ? "0".concat(s.getStartHour()) : s.getStartHour();
+            startHour += ":00";
+            String endHour = s.getEndHour().length() == 1 ? "0".concat(s.getEndHour()) : s.getEndHour();
+            endHour += ":00";
+            String patronymic = s.getUserPatronymic().equals("null") ? null : s.getUserPatronymic();
 
-                    String query  = "select users.name, users.surname, users.patronymic, users.passportid, users.issuedby, users.departmentnumber, " +
-                        "users.dateofissue, " + "sessions.book, sessions.author, sessions.date, sessions.starttime, sessions.endtime, sessions.userid," +
-                            " sessions.userarrived from users join sessions" +
-                            " on users.userid = sessions.userid where date = '" + date + "'";
-                    if(isCardTodaySessions)
-                            query = query.concat(" and userarrived = 0;");
-                        else
-                            query = query.concat(";");
+            Object[] row = { s.getBookName(), startHour + " - " + endHour, s.getUserSurname() + " " + s.getUserName() + " " +
+                     patronymic,  PHONE_NUM_BEGIN + s.getUserPhone(), s.getStatus()};
 
-                ResultSet res = statement.executeQuery(query);
-                ArrayList<Session> sessions = new ArrayList<>();
+            model.addRow(row);
 
-                while (res.next()) {
-//                    User user = new User(res.getInt("userid"), res.getString("name"), res.getString("surname"),
-//                            res.getString("patronymic"), "", "", "", 0, res.getString("passportid"),
-//                            res.getString("issuedby"), res.getString("departmentnumber"), res.getString("dateofissue"));
-//                    sessions.add(new Session(res.getString("book"), res.getString("author"), res.getString("date"),
-//                            res.getString("starttime") + " - " + res.getString("endtime"), user));
-                }
-                //сортируем массив по starttime
-                sortSessions(sessions);
-                for (int i = 0; i < sessions.size(); i++) {
-                    Session session = sessions.get(i);
-                    User user = session.getUser();
-//
-//                    Object[] rowData = {session.getBook(), session.getAuthor(), session.getTime(), user.getSurname() + " " + user.getName() + " " +
-//                            user.getPatronymic(), user.getId(), user.getPassportId(), user.getIssuedBy(), user.getDepartmentNum(), user.getDateOfIssue()};
-//                    model.addRow(rowData);
-                }
-
-            } catch (SQLException exception) {
-                showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-                exception.printStackTrace();
-            }
-
-            todaySessions.setFillsViewportHeight(true);
-            //todaySessions.setEnabled(false);
-            panel.add(todaySessions, BorderLayout.CENTER);
-
-            JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            sp.setOpaque(false);
-
-
-        if(!isCardTodaySessions){ // для карточки всех сессий
-            pnlAllTimeSessions.add(sp,BorderLayout.CENTER);
-            pnlAllTimeSessions.updateUI();
-        } else {
-
-            pnlTodaySessions.add(sp, BorderLayout.CENTER);
-
-            JButton btnMarkedUserArrived = new JButton("Отметить выполненными");
-            btnMarkedUserArrived.setFocusPainted(false);
-            btnMarkedUserArrived.setEnabled(false);
-
-            pnlTodaySessions.add(btnMarkedUserArrived, BorderLayout.SOUTH);
-
-            ListSelectionModel selModel = todaySessions.getSelectionModel();
-
-            selModel.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    btnMarkedUserArrived.setEnabled(false);
-                    int[] selectedRows = todaySessions.getSelectedRows();
-                    if(selectedRows.length == 1)
-                        btnMarkedUserArrived.setEnabled(true);
-                }
-            });
-
-            btnMarkedUserArrived.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    int[] selectedRows = todaySessions.getSelectedRows();
-                    for (int i = 0; i < selectedRows.length; i++) {
-                        int selIndex = selectedRows[i];
-                        TableModel model1 = todaySessions.getModel();
-                        Integer userid = (Integer) model1.getValueAt(selIndex, 4);
-                        String startime = ((String) model1.getValueAt(selIndex, 2)).substring(0, 5);
-                        setUserArrivedTrueInDatabase(userid, today, startime);
-                        model.removeRow(selIndex);
-                        btnMarkedUserArrived.setEnabled(false);
-                    }
-                }
-            });
         }
+
+        return table;
     }
 
-    private void initializeCbDay(){
+
+    private void fillCbDay(){
         //создать элементы комбобокс
-        LocalDate startDate = LocalDate.now().minusDays(30);
-        LocalDate endDate = LocalDate.now().plusDays(20);
-        LocalDate buf = startDate;
+        LocalDate startDate = LocalDate.now().minusDays(10);
+        LocalDate endDate = LocalDate.now().plusDays(30);
+        LocalDate buf = startDate.plusDays(1);
         while(!buf.equals(endDate)){
             String day = String.valueOf(buf.getDayOfMonth());
             String month = String.valueOf(buf.getMonthValue());
@@ -820,36 +844,6 @@ public class AdminMainFrame extends JDialog {
 
     }
 
-    private void sortSessions(ArrayList<Session>  sessions){
-            //МЕТОД ПУЗЫРЬКОВОЙ СОРТИРОВКИ
-        int leftStartTime = 0;
-        int rightStartTime = 0;
-        for (int out = sessions.size() - 1; out >= 1; out--){  //Внешний цикл
-            for (int in = 0; in < out; in++){
-                leftStartTime = Integer.parseInt(sessions.get(in).getTime().substring(0, 2)); //Внутренний цикл
-                rightStartTime = Integer.parseInt(sessions.get(in + 1).getTime().substring(0, 2));
-                if(leftStartTime > rightStartTime) {               //Если порядок элементов нарушен
-                    Session temp = sessions.get(in);
-                    sessions.set(in, sessions.get(in + 1));
-                    sessions.set(in + 1, temp);
-                }//вызвать метод, меняющий местами
-            }
-        }
-
-    }
-
-    private void setUserArrivedTrueInDatabase(int userid, String date, String startTime){
-        try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-            Statement statement = connection.createStatement()){
-
-            statement.executeUpdate("update sessions set userarrived = 1 where userid = '" + userid + "' and date = '" + date + "' and " +
-                    "starttime = '" + startTime + "';");
-
-        } catch (SQLException exception){
-            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-            exception.printStackTrace();
-        }
-    }
 
     private void showErrorMessage(String message, String title){
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);

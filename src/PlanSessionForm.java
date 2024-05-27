@@ -9,28 +9,24 @@ import java.awt.event.WindowEvent;
 import java.nio.file.AccessDeniedException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 public class PlanSessionForm extends JDialog {
     private JPanel panel1;
     private JComboBox cbDay;
     private JComboBox cbTime;
     private JButton btnOK;
-    final int daysToPlanSessionAhead = 20;
-    //final int maximumPeopleInSessionTime = 10;
+    final int daysToPlanSessionAhead = 30;
     private final String bookName;
-    private final String bookAuthor;
     private boolean dayIsChosen = false;
+    private final String SESSION_NOT_COMPLETED = "не завершена";
 
     public PlanSessionForm(JFrame parent, BookInfo bookInfo, int userId){
         super(parent);
        setContentPane(panel1);
         setLocation(500, 250);
         setModal(true);
-        setSize(new Dimension(330, 300));
+        setSize(new Dimension(330, 170));
         setResizable(false);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -40,12 +36,68 @@ public class PlanSessionForm extends JDialog {
                 bookInfo.setVisible(true);
             }
         });
-        LocalDate currentDate = LocalDate.now().plusDays(1);
-        bookName = bookInfo.getBookName();
-        bookAuthor = bookInfo.getBookAuthor().substring(8);
 
-        LocalDate bufDate = currentDate;
-        String startMonth = bufDate.getMonth().toString();
+        bookName = bookInfo.getBook().getName();
+
+        fillCbDay();
+
+
+        cbDay.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dayIsChosen = true;
+                cbTime.removeAllItems();
+                String fullDate = (String)cbDay.getSelectedItem();
+                String date = fullDate.substring(fullDate.length() - 5); // УБРАЛ ДЕНЬ НЕДЕЛИ ИЗ ДАТЫ : ПРИМЕР - 25.02
+                ArrayList<String> availableHours = getAvailableHours(date);
+                if(availableHours.isEmpty())
+                    cbTime.addItem("Нет свободных сеансов");
+                for(int i = 0; i < availableHours.size(); i++){
+                    cbTime.addItem(availableHours.get(i));
+                }
+            }
+        });
+
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!dayIsChosen )
+                    showErrorMessage("Выберите день и время сеанса!", "Ошибка!");
+                else{
+                    String fullDate = (String) cbDay.getSelectedItem();
+                    String date = fullDate.substring(fullDate.length() - 5);
+                    String time = (String) cbTime.getSelectedItem();
+                    String startTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
+                            + " " +  time.substring(0, 5);
+                    String endTime = getCurrentYear() + "-" + date.substring(3) + "-" + date.substring(0, 2)
+                    + " " + time.substring(8, 13);
+
+                    try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
+                        Statement statement = connection.createStatement()){
+
+                       final String query = "insert into sessions (user_id, book_id, start_time, end_time, status) " +
+                               "values('" + userId + "', (select id from books where name = '" + bookInfo.getBook().getName() +
+                               "'), '" + startTime + "', '" + endTime + "', '" + SESSION_NOT_COMPLETED + "');";
+                       statement.executeUpdate(query);
+                       showInformationMessage("Сеанс назначен", "Сообщение");
+                       dispose();
+                       bookInfo.dispose();
+                    } catch (SQLException ex){
+                        showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        setVisible(true);
+    }
+
+    private void fillCbDay(){
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate bufDate = currentDate.plusDays(1);
+
         int[] daysOfMonth = new int[daysToPlanSessionAhead];
         String[] daysOfWeek = new String[daysToPlanSessionAhead];
 
@@ -78,82 +130,30 @@ public class PlanSessionForm extends JDialog {
             daysAvailable[i] = dayOfWeek + " " + date;
             cbDay.addItem(daysAvailable[i]); // ДОБАВИЛИ В ПЕРВЫЙ СОМБОБОКС ВСЕ ДОСТУПНЫЕ ДНИ
         }
-
-
-       // cbTime.addItem("Выберите день");
-
-        cbDay.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dayIsChosen = true;
-                cbTime.removeAllItems();
-                String fullDate = (String)cbDay.getSelectedItem();
-                String date = fullDate.substring(fullDate.length() - 5); // УБРАЛ ДЕНЬ НЕДЕЛИ ИЗ ДАТЫ : ПРИМЕР - 25.02
-                ArrayList<String> availableHours = getAvailableHours(date, userId);
-                if(availableHours.isEmpty())
-                    cbTime.addItem("Нет свободных сеансов");
-                for(int i = 0; i < availableHours.size(); i++){
-                    cbTime.addItem(availableHours.get(i));
-                }
-            }
-        });
-
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(!dayIsChosen )
-                    showErrorMessage("Выберите день и время сеанса!", "Ошибка!");
-                else{
-                    String fullDate = (String) cbDay.getSelectedItem();
-                    String date = fullDate.substring(fullDate.length() - 5);
-                    String time = (String) cbTime.getSelectedItem();
-                    String startTime = time.substring(0, 5);
-                    String endTime = time.substring(8, 13);
-
-                    try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-                        Statement statement = connection.createStatement()){
-
-                       String query = "insert into sessions (date, starttime, endtime, book, author, userid) values ('" + date + "', '" + startTime + "', '" +
-                               endTime + "', '" + bookName + "', '" + bookAuthor + "', '" + userId + "');";
-                       statement.executeUpdate(query);
-                       showInformationMessage("Успех!", "");
-                       dispose();
-                       bookInfo.dispose();
-                    } catch (SQLException ex){
-                        showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        setVisible(true);
     }
 
-    private ArrayList<String> getAvailableHours(String date, int userId){
-        ArrayList<String> availableHours = new ArrayList<>(Arrays.asList("08:00 - 09:00", "09:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00",
-                "12:00 - 13:00", "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00", "17:00 - 18:00", "18:00 - 19:00", "19:00 - 20:00"));
+    private ArrayList<String> getAvailableHours(String date){
+        ArrayList<String> availableHours = new ArrayList<>(Arrays.asList("08:00 - 09:00", "09:00 - 10:00",
+                "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00",
+                "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00",
+                "17:00 - 18:00", "18:00 - 19:00", "19:00 - 20:00"));
 
         try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
             Statement statement = connection.createStatement()) {
 
-            String query = "select starttime, endtime from sessions where date = '" + date + "' and book = '" + bookName  + "' and " +
-                    "author = '" + bookAuthor + "';";
+            String query = "select (select extract(hour from start_time)) AS start_hour," +
+                    " (select extract(hour from end_time)) AS end_hour from sessions where (select extract(month from start_time)) = '" +
+                    date.substring(3) + "' and (select extract(day from start_time)) = '" +
+                    date.substring(0, 2)  + "' and book_id = (select id from books where name = '" + bookName + "');";
 
             ResultSet res = statement.executeQuery(query);
 
             while(res.next()){
-                String startTime = res.getString("starttime");
-                String endTime = res.getString("endtime");
-                alterAvailableHours(availableHours, date, startTime, endTime);
-            }
-
-            query = "select starttime, endtime from sessions where userid = '" + userId + "' and date = '" + date + "';";
-            ResultSet res1 = statement.executeQuery(query);
-            while(res1.next()){
-                String startTime = res1.getString("starttime");
-                String endtTime = res1.getString("endtime");
-                alterAvailableHours(availableHours, date, startTime, endtTime);
+                String startTime = res.getString("start_hour");
+                startTime = startTime.length() == 1 ? "0".concat(startTime) : startTime;
+                String endTime = res.getString("end_hour");
+                endTime = endTime.length() == 1 ? "0".concat(endTime) : endTime;
+                alterAvailableHours(availableHours, startTime, endTime);
             }
 
             return availableHours;
@@ -166,34 +166,21 @@ public class PlanSessionForm extends JDialog {
         return null;
     }
 
-    private void alterAvailableHours(ArrayList<String> availableHours, String date, String startTime, String endTime){
-        for(int i = 0; i < availableHours.size(); i++){
-            String firstPart = availableHours.get(i).substring(0,5);
-            String secondPart = availableHours.get(i).substring(8, 13);
+    private void alterAvailableHours(ArrayList<String> availableHours, String startTime, String endTime){
+        Iterator<String> iter = availableHours.iterator();
+        while(iter.hasNext()){
+            String elem = iter.next();
+            String firstPart = elem.substring(0, 2);
+            String secondPart = elem.substring(8, 10);
             if(firstPart.equals(startTime) && secondPart.equals(endTime))
-                availableHours.remove(i);
-//            else if(isPeopleLimitReachedInOneSession(date, startTime, endTime))
-//                availableHours.remove(i);
+                iter.remove();
         }
+
     }
 
-//    private boolean isPeopleLimitReachedInOneSession(String date, String startTime, String endTime){
-//        try(Connection connection = DriverManager.getConnection(Database.URL, Database.USERNAME, Database.PASSWORD);
-//            Statement statement = connection.createStatement()){
-//
-//            String query = "select count (*) from sessions where date = '" + date + "' and starttime = '" + startTime + "' and endtime = '" + endTime + "" +
-//                    "' limit 1;";
-//            ResultSet res = statement.executeQuery(query);
-//            if(res.next())
-//                return res.getInt("count") >= 10;
-//
-//        } catch (SQLException ex){
-//            showErrorMessage("Ошибка соединения с базой данных. Попробуйте позже", "Ошибка!");
-//            ex.printStackTrace();
-//        }
-//        return false;
-//    }
-
+    private int getCurrentYear(){
+        return LocalDate.now().getYear();
+    }
 
     private void showInformationMessage(String message, String title){
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
